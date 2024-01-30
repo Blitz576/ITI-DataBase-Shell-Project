@@ -14,7 +14,7 @@ while true; do
                 echo "Enter the database name: "
                 read dbName
 
-                while [ -d ~/database/$dbName ]; do
+                while [ -d database/$dbName ]; do
                     echo "$dbName Already Exists. Please Enter Another Name: "
                     read dbName
                 done
@@ -27,18 +27,24 @@ while true; do
 		*[^a-zA-Z0-9)
                     
 
-                        echo "Database Name Cannot Have Special Characters or Spaces."
+                        echo "Database Name Cannot Have Special Characters."
                         continue
                         ;;
                     +([a-zA-Z_]*))
-                        mkdir -p ~/database/$dbName
+                        mkdir -p database/$dbName
                         echo "$dbName Created Successfully."
                         break
                         ;;
                 esac
                 ;;
             2)
-                echo "Option 2 is chosen"
+                if [ -n "$(ls database/)" ]; then
+                echo Available Databases:
+                ls -F database/ | grep /
+          	
+                else
+	            echo "There Are No Databases"
+                fi
                 ;;
             3)
                 echo "Option 3 is chosen"
@@ -56,4 +62,3 @@ while true; do
         esac
     done
 done
-
