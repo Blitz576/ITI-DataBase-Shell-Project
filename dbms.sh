@@ -1,26 +1,59 @@
 #!/bin/bash
-
-
 #create a database main menu
 
 PS3="your choice : "
+export LC_COLLATE=C
+shopt -s extglob
 
-select menu in "Create a DataBase" "List DataBases" "Connect To DataBase" "Drop DataBase" "Exit"
-do
-case $REPLY in 
-1) echo "one is choosen"
-;;
-2) echo "one is choosen"
-;;
-3) echo "one is choosen"
-;;
-4) echo "one is choosen"
-;;
-5) echo "System Ended"
- break
-;;
-*) echo "you have choosen a worng number plaese try again"
-;;
-esac
+PS3="Your choice: "
+
+while true; do
+    select menu in "Create a Database" "List Databases" "Connect To Database" "Drop Database" "Exit"; do
+        case $REPLY in
+            1)
+                echo "Enter the database name: "
+                read dbName
+
+                while [ -d ~/database/$dbName ]; do
+                    echo "$dbName Already Exists. Please Enter Another Name: "
+                    read dbName
+                done
+
+                case $dbName in
+                    [0-9]*)
+                        echo "Database Name Cannot Start With Numbers."
+                        continue
+                        ;;
+		*[^a-zA-Z0-9)
+                    
+
+                        echo "Database Name Cannot Have Special Characters or Spaces."
+                        continue
+                        ;;
+                    +([a-zA-Z_]*))
+                        mkdir -p ~/database/$dbName
+                        echo "$dbName Created Successfully."
+                        break
+                        ;;
+                esac
+                ;;
+            2)
+                echo "Option 2 is chosen"
+                ;;
+            3)
+                echo "Option 3 is chosen"
+                ;;
+            4)
+                echo "Option 4 is chosen"
+                ;;
+            5)
+                echo "System ended."
+                exit 0
+                ;;
+            *)
+                echo "Invalid option. Please choose a number between 1 and 5."
+                ;;
+        esac
+    done
 done
 
