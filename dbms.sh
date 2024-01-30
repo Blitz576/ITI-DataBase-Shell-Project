@@ -5,6 +5,7 @@ PS3="your choice : "
 export LC_COLLATE=C
 shopt -s extglob
 
+#change the select prompt
 PS3="Your choice: "
 
 while true; do
