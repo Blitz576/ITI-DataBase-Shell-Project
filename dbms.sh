@@ -6,9 +6,9 @@ PS3="Main System > "
 export LC_COLLATE=C
 shopt -s extglob
 
-# main functions
+#######main functions #######
 
-function create_main_DataBase_directory () {
+function createDataBasesDirectory () {
     echo "Welcome to our Bash Sql system."
     echo "After reading this line, a database directory has been created in your current directory under the name of 'DataBases'."
     echo "If you have used our program before, don't worry ..."
@@ -20,7 +20,7 @@ function create_main_DataBase_directory () {
 
 function createDataBase () {
     local local_dbName="$1"
-    while [ -d "database/$local_dbName" ]; do
+    while [ -d "DataBases/$local_dbName" ]; do
         echo "$local_dbName Already Exists. Please Enter Another Name: "
         read local_dbName
     done
@@ -36,21 +36,42 @@ function createDataBase () {
             echo "Database Name Cannot Have Special Characters."
             ;;
         *)
-            mkdir -p "database/$local_dbName"
+            mkdir -p "DataBases/$local_dbName"
             echo "$local_dbName Created Successfully."
             ;;
     esac
 }
 
-# create a directory for user databases
-create_main_DataBase_directory
+function connectToDataBase () {
+    local dbName="$1"
+    
+    if [ -d "DataBases" ] 
+    then
+          cd "DataBases"
+        if [[ -d $dbName ]]; then
+            cd "$dbName"
+            source ../../tables.sh "$dbName"
+        else
+          echo "DataBase is not exist"
+          cd ..    
+        fi
+    else
+        echo "Missing DataBases directory please create a DataBase"
+    fi
+    
+}
+
+
+
+
+# create a directory for ueabases
+createDataBasesDirectory
 
 
 select menu in "Create a Database" "List Databases" "Connect To Database" "Drop Database" "Exit"; do
     case $REPLY in
         1)
-            echo "Enter the database name: "
-            read dbName
+            read -p "Enter the database name: " dbName
             createDataBase "$dbName"
             ;;
         2)
@@ -62,7 +83,8 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             fi
             ;;
         3)
-            echo "Option 3 is chosen"
+            read -p "Enter the database name: " _dbName
+            connectToDataBase "$_dbName"
             ;;
         4)
             echo "Option 4 is chosen"
@@ -76,3 +98,4 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             ;;
     esac
 done
+
