@@ -8,7 +8,7 @@ shopt -s extglob
 #change the select prompt
 PS3="Your choice: "
 
-while true; do
+
     select menu in "Create a Database" "List Databases" "Connect To Database" "Drop Database" "Exit"; do
         case $REPLY in
             1)
@@ -23,19 +23,19 @@ while true; do
                 case $dbName in
                     [0-9]*)
                         echo "Database Name Cannot Start With Numbers."
-                        continue
                         ;;
-		*[^a-zA-Z0-9)
+                    ' '|*' '*|' '*|*' ')
+                    echo "Database Name Should Not have any Spaces"
+                    ;;
                     
-
-                        echo "Database Name Cannot Have Special Characters."
-                        continue
-                        ;;
-                    +([a-zA-Z_]*))
+                    +([a-zA-Z]*))
                         mkdir -p database/$dbName
                         echo "$dbName Created Successfully."
-                        break
                         ;;
+		            *)
+                        echo "Database Name Cannot Have Special Characters."
+                        ;;
+
                 esac
                 ;;
             2)
@@ -55,11 +55,10 @@ while true; do
                 ;;
             5)
                 echo "System ended."
-                exit 0
+                break;
                 ;;
             *)
                 echo "Invalid option. Please choose a number between 1 and 5."
                 ;;
         esac
     done
-done
