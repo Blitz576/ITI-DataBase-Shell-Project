@@ -28,7 +28,7 @@ PS3="Your choice: "
                     echo "Database Name Should Not have any Spaces"
                     ;;
                     
-                    +([a-zA-Z]*))
+                    +([a-zA-Z]))
                         mkdir -p database/$dbName
                         echo "$dbName Created Successfully."
                         ;;
