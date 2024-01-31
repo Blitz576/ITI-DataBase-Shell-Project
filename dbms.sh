@@ -61,7 +61,20 @@ function connectToDataBase () {
     
 }
 
+function dropDataBase() {
+    
+    if [ ! -d "databases/$local_dbName" ]
+    then
+        echo "Database Not Found."
+    fi
+    local local_dbName="$1"
+    while [ -d "DataBases/$local_dbName" ]; do
+        rm -r Databases/$local_dbName
+        echo "$local_dbName deleted successfully"
 
+    done
+    
+}
 
 
 # create a directory for ueabases
@@ -87,7 +100,8 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             connectToDataBase "$_dbName"
             ;;
         4)
-            echo "Option 4 is chosen"
+            read -p "Enter the database name: " _dbName
+            dropDataBase "$_dbName"    
             ;;
         5)
             echo "System ended."
