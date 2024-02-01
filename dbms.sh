@@ -73,7 +73,16 @@ function dropDataBase() {
     echo "$local_dbName deleted successfully"
     
 }
-
+function listDataBases()
+{
+    if [ -n "$(ls -d DataBases/*/)" ]; then
+        echo "Available Databases:"
+        ls -d DataBases/*/ | sed 's|.*/||'
+    else
+        echo "There Are No Databases"
+    fi
+    
+}
 
 # create a directory for ueabases
 createDataBasesDirectory
@@ -86,12 +95,7 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             createDataBase "$dbName"
             ;;
         2)
-            if [ -n "$(ls -d database/*/)" ]; then
-                echo "Available Databases:"
-                ls -d database/*/ | sed 's|.*/||'
-            else
-                echo "There Are No Databases"
-            fi
+            listDataBases
             ;;
         3)
             read -p "Enter the database name: " _dbName
