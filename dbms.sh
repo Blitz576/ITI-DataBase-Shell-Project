@@ -63,16 +63,14 @@ function connectToDataBase () {
 
 function dropDataBase() {
     
-    if [ ! -d "databases/$local_dbName" ]
+    if [ ! -d "DataBases/$local_dbName" ]
     then
         echo "Database Not Found."
+        return ;
     fi
     local local_dbName="$1"
-    while [ -d "DataBases/$local_dbName" ]; do
-        rm -r Databases/$local_dbName
-        echo "$local_dbName deleted successfully"
-
-    done
+    rm -r DataBases/$local_dbName
+    echo "$local_dbName deleted successfully"
     
 }
 
