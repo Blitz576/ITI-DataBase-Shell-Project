@@ -9,6 +9,7 @@ function setTableAttributes() {
   while [ true ]; do
    read -p "Attribute : " attr
    echo $attr 
+   
   done
   
 }
