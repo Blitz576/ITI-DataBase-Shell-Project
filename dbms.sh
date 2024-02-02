@@ -13,6 +13,24 @@ export LC_COLLATE=C
 shopt -s extglob
 
 #######main functions #######
+function validateName(){
+   local localName=$1
+   local localType="$2" 
+    case $localName in
+        [!a-zA-Z]*)
+            echo "$localType Name Cannot Start With Special Characters Or Numbers."
+            ;;
+        " ")
+            echo "$localType Name Should Not Have Any Spaces."
+            ;;
+        [!a-z0-9A-Z])
+            echo "$localType Name Cannot Have Special Characters."
+            ;;
+        *)
+            return 1;  
+            ;;
+    esac
+}
 
 function createDataBasesDirectory () {
     echo "Welcome to our Bash Sql system."
@@ -31,21 +49,11 @@ function createDataBase () {
         read local_dbName
     done
 
-    case $local_dbName in
-        [!a-zA-Z]*)
-            echo "Database Name Cannot Start With Special Characters Or Numbers."
-            ;;
-        " ")
-            echo "Database Name Should Not Have Any Spaces."
-            ;;
-        [!a-zA-Z])
-            echo "Database Name Cannot Have Special Characters."
-            ;;
-        *)
-            mkdir -p "DataBases/$local_dbName"
-            echo "$local_dbName Created Successfully."
-            ;;
-    esac
+    validateName "$local_dbName"
+    if [ $? -eq 1 ]; then
+       mkdir -p "DataBases/$local_dbName"
+       echo "$local_dbName Created Successfully."         
+    fi
 }
 
 function connectToDataBase () {
@@ -56,7 +64,8 @@ function connectToDataBase () {
           cd "DataBases"
         if [[ -d $dbName ]]; then
             cd "$dbName"
-            source ../../tables.sh "$dbName"
+            cd ../..
+            ./tables.sh "$dbName"
         else
           echo "DataBase is not exist"
           cd ..    

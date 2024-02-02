@@ -3,16 +3,25 @@
 
 #########main functions##########
 function setTableAttributes() {
+  local tableMetaData=$1
 
-  echo "after entering your table columns please type 'done' to end statement"
-  local times=0
-  while [ true ]; do
-   read -p "Attribute : " attr
-   echo $attr 
-   
+  feilds("Feild Name" "Constraint" "Data Type");
+  echo ${feilds[*]} >> $tableMetaData
+  read -p "Enter the number of feilds: " feild
+ for ((item=1; item<=$field; item++)); do
+    read -p "column name : " columnName
+    validateName "$columnName" "Feild"
+    if [ $? -eq 1 ]; then
+        feilds[0]=$columnName  
+      else
+        continue
+    fi
+    read -p "Primary(press p) or Not(press n) : "
+          
+    read -p "Integer(press i) or String(press s) : " columnName
+        
   done
-  
-}
+} 
 
 
 function createTable () {
@@ -35,7 +44,7 @@ function createTable () {
         *)
             touch "$local_tableName"
             touch "${local_tableName}.meta"
-            setTableAttributes
+            setTableAttributes "${local_tableName}.meta"
             ;;
     esac
 }
