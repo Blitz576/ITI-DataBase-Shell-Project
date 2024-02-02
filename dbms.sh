@@ -27,12 +27,12 @@ function createDataBase () {
 
     case $local_dbName in
         [!a-zA-Z]*)
-            echo "Database Name Cannot Start With Special Characters or Numbers."
-            ;;    
-        *" "*)
+            echo "Database Name Cannot Start With Special Characters Or Numbers."
+            ;;
+        " ")
             echo "Database Name Should Not Have Any Spaces."
             ;;
-        *[!a-z0-9A-Z]*)
+        [!a-zA-Z])
             echo "Database Name Cannot Have Special Characters."
             ;;
         *)
@@ -73,16 +73,7 @@ function dropDataBase() {
     echo "$local_dbName deleted successfully"
     
 }
-function listDataBases()
-{
-    if [ -n "$(ls -d DataBases/*/)" ]; then
-        echo "Available Databases:"
-        ls -d DataBases/*/ | sed 's|.*/||'
-    else
-        echo "There Are No Databases"
-    fi
-    
-}
+
 
 # create a directory for ueabases
 createDataBasesDirectory
@@ -95,7 +86,12 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             createDataBase "$dbName"
             ;;
         2)
-            listDataBases
+            if [ -n "$(ls -d database/*/)" ]; then
+                echo "Available Databases:"
+                ls -d database// | sed 's|./||'
+            else
+                echo "There Are No Databases"
+            fi
             ;;
         3)
             read -p "Enter the database name: " _dbName
@@ -114,4 +110,3 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             ;;
     esac
 done
-
