@@ -24,7 +24,8 @@ function setTableAttributes() {
     if [ $fname -eq 0 ]; then
       read -p "column name : " columnName
       validateName "$columnName" "Feild"
-      if [ $? -eq 1 ]; then
+      local returnValidateName=$?
+      if [ $returnValidateName -eq 1 ]; then
           fields[0]=$columnName
           fname=1  
         else
@@ -38,11 +39,13 @@ function setTableAttributes() {
 
         read -p "Primary(p) or Not(n) : " feildConstraint
         checkPrimary "$feildConstraint"
-        if [ $? -eq 1 ]; then
+        local returnCheckPrimary=$?
+        if [ $returnCheckPrimary -eq 1 ]; then
           fields[1]="PRIMARY"
-        elif [ $? -eq 2 ]; then
+        elif [ $returnCheckPrimary -eq 2 ]; then
           fields[1]="NOT"
         else
+          echo $feildConstraint
           echo "there's wrong while typing please check and try again"
           continue
         fi
@@ -51,12 +54,13 @@ function setTableAttributes() {
 
     #check if the field data type was entered or not
   if [ $fdatatype -eq 0 ]; then
-    read -p "Integer(press i) or String(press s) : " dataType
+    read -p "Integer(i) or String(s) : " dataType
         dataIntegrity "$dataType"
-      if [ $? -eq 1 ]; then
-       fields[1]="INT"
-      elif [ $? -eq 2 ]; then
-       fields[1]="STRING"
+        local returnDataIntegrity=$?
+      if [ $returnDataIntegrity -eq 1 ]; then
+       fields[2]="INT"
+      elif [ $returnDataIntegrity -eq 2 ]; then
+       fields[2]="STRING"
       else
        echo "there's wrong while typing please check and try again"
        continue
@@ -71,7 +75,8 @@ function setTableAttributes() {
   local fpconstraint=0
   local fdatatype=0
 
-
+  #increase the iterator
+  ((iterator++))
 
   done
 } 
@@ -107,4 +112,3 @@ function dropTable() {
     echo "$local_TableName deleted successfully"
     
 }
-

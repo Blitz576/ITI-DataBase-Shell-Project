@@ -1,6 +1,6 @@
 #import table main functions
-source ./function/table_function.sh
-
+source ./function/tables_function.sh
+source ./function/other_function.sh
 #table page
 
 
@@ -14,7 +14,7 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
     case $REPLY in
         1)
             read -p "Enter the database name: " tableName
-            createTable "$tableName"
+            createTable "$tableName" "Table"
             ;;
         2)
             if [ -n "$(ls $PWD/*)" ]; then
