@@ -11,33 +11,46 @@ function setTableAttributes() {
 
   #write them down to meta data file
   echo ${fields[*]} >> $tableMetaData
+   
+  #Define feild checkers
+  local fname=0
+  local fpconstraint=0
+  local fdatatype=0
 
   read -p "Enter the number of feilds: " feildCount
  
   while [ $iterator -lt $feildCount ]; do
-  #input feild name
-    read -p "column name : " columnName
-    validateName "$columnName" "Feild"
-    if [ $? -eq 1 ]; then
-        fields[0]=$columnName  
-      else
-        echo "there's wrong while typing please check and try again"
-        continue
+   #check if the field name was entered or not
+    if [ $fname -eq 0 ]; then
+      read -p "column name : " columnName
+      validateName "$columnName" "Feild"
+      if [ $? -eq 1 ]; then
+          fields[0]=$columnName
+          fname=1  
+        else
+          echo "there's wrong while typing please check and try again"
+          continue
+      fi
     fi
-    #input field Primary constraint
-    read -p "Primary(p) or Not(n) : " feildConstraint
+
+    #check if the field Primary constraint was entered or not
+    if [ $fpconstraint -eq 0 ]; then
+
+        read -p "Primary(p) or Not(n) : " feildConstraint
+        checkPrimary "$feildConstraint"
+        if [ $? -eq 1 ]; then
+          fields[1]="PRIMARY"
+        elif [ $? -eq 2 ]; then
+          fields[1]="NOT"
+        else
+          echo "there's wrong while typing please check and try again"
+          continue
+        fi
+    fi
 
 
-     checkPrimary "$feildConstraint"
-     if [ $? -eq 1 ]; then
-       fields[1]="PRIMARY"
-     elif [ $? -eq 2 ]; then
-       fields[1]="NOT"
-     else
-       echo "there's wrong while typing please check and try again"
-       continue
-     fi
-        
+    #check if the field data type was entered or not
+  if [ $fdatatype -eq 0 ]; then
     read -p "Integer(press i) or String(press s) : " dataType
         dataIntegrity "$dataType"
       if [ $? -eq 1 ]; then
@@ -48,6 +61,18 @@ function setTableAttributes() {
        echo "there's wrong while typing please check and try again"
        continue
      fi
+  fi
+
+  #append data to meta data file
+  echo ${fields[*]} >> $tableMetaData
+  
+  #reset the values of checkers
+  local fname=0
+  local fpconstraint=0
+  local fdatatype=0
+
+
+
   done
 } 
 
