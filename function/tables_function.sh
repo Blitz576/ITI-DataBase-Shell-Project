@@ -42,18 +42,6 @@ function createTable () {
 
 
 
-function connectToTable () {
-    local tableName="$1"
-    
-        if [[ -f  tableName ]]; then
-            source ../../table.sh "$tableName" "$parentDataBase" 
-        else
-          echo "Table is not exist"
-          cd ..    
-        fi
-    
-}
-
 function dropTable() {
     
     local local_TableName="$1"

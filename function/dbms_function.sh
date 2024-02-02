@@ -1,6 +1,7 @@
 #import main functions
 source ./other_function.sh
 
+
 function createDataBasesDirectory () {
     echo "Welcome to our Bash Sql system."
     echo "After reading this line, a database directory has been created in your current directory under the name of 'DataBases'."
@@ -58,9 +59,10 @@ function dropDataBase() {
     
 }
 function listDataBases(){
-    if [ -n "$(ls -d DataBases/*/)" ]; then
+   local dataBaseCount=`ls  DataBases/ 2>/dev/null | wc -l`
+    if [ $dataBaseCount -gt 0 ]; then
                 echo "Available Databases:"
-                ls -d DataBases/*/ | sed 's|.*/||'
+                ls  DataBases/ | sed 's/DataBases\///'
             else
                 echo "There Are No Databases"
             fi
