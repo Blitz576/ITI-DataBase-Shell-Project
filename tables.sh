@@ -1,11 +1,19 @@
 #table page
 
 
-##########DataBase Name########
-parentDataBase=$1;
-
-
 #########main functions##########
+function setTableAttributes() {
+
+  echo "after entering your table columns please type 'done' to end statement"
+  local times=0
+  while [ true ]; do
+   read -p "Attribute : " attr
+   echo $attr 
+  done
+  
+}
+
+
 function createTable () {
     local local_tableName="$1"
     if [ -f "$local_tableName" ]; then
@@ -25,10 +33,12 @@ function createTable () {
             ;;
         *)
             touch "$local_tableName"
-            echo "$local_tableName Created Successfully."
+            touch "${local_tableName}.meta"
+            setTableAttributes
             ;;
     esac
 }
+
 
 
 function connectToTable () {
@@ -92,6 +102,5 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
             ;;
     esac
 done
-
 
 PS3="Main System > "

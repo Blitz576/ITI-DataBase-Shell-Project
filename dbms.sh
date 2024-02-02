@@ -1,6 +1,12 @@
 #!/bin/bash
 #DataBase Main System
 
+
+##########saving currnet directory########
+currentDir=$PWD
+
+
+
 # change the select prompt
 PS3="Main System > "
 export LC_COLLATE=C
@@ -105,6 +111,7 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             ;;
         5)
             echo "System ended."
+            cd $currentDir
             break
             ;;
         *)
