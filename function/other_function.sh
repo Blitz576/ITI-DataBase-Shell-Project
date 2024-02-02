@@ -19,12 +19,25 @@ function validateName(){
 
 function checkPrimary(){
     local local_choice=$1
-    
-    if [ $local_choice = "p" -o $local_choice = "P" ]; then
+    local_choice=`echo "$local_choice" | tr '[:upper:]' '[:lower:]'`
+    if [ $local_choice = "p" -o $local_choice = "primary" ]; then
         return 1;
-    elif [ $local_choice = "n" -o $local_choice = "N" ]; then
+    elif [ $local_choice = "n" -o $local_choice = "not" ]; then
          return 2;
     else
          return 0;
     fi   
+}
+
+function dataIntegrity(){
+    local dataType=$1
+
+    if [[ $dataType =~ ^[0-9]+$ ]]; then
+        return 1;
+    elif [[ -n $dataType && $dataType != " "* ]]; then
+        return 2;
+    else
+         return 0;
+    fi
+       
 }
