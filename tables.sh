@@ -1,10 +1,11 @@
 #import table main functions
-source ./function/tables_function.sh
-source ./function/other_function.sh
+echo "$PWD"
+source ../.././function/tables_function.sh
+source ../.././function/other_function.sh
 #table page
 
 
-
+echo $PWD
 
 PS3="$1 >"
 

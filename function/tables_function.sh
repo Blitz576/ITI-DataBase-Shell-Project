@@ -89,11 +89,11 @@ function createTable () {
         read local_tableName
     fi
 
-    validateName "$local_dbName" "DataBase"
+    validateName "$local_dbName" "Tablee"
 
     if [ $? -eq 1 ]; then
-    touch "$local_tableName"
-    touch "${local_tableName}.meta"
+    touch "$PWD/$local_tableName"
+    touch "$PWD/${local_tableName}.meta"
     setTableAttributes "${local_tableName}.meta"
     fi
 }

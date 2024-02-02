@@ -33,9 +33,10 @@ function connectToDataBase () {
     then
           cd "DataBases"
         if [[ -d $dbName ]]; then
+            echo $PWD
             cd "$dbName"
-            cd ../..
-            ./tables.sh "$dbName"
+            echo $PWD
+            ../.././tables.sh "$dbName"
         else
           echo "DataBase is not exist"
           cd ..    
