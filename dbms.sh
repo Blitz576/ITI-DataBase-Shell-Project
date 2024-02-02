@@ -3,16 +3,12 @@
 
 #import data base functions
 source ./function/dbms_function.sh
-source ./function/other_function.sh
-
 
 
 #DataBase Main System
 
 
-
-
-##########saving currnet directory########
+#saving currnet directory
 currentDir=$PWD
 
 
