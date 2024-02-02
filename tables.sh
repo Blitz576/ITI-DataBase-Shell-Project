@@ -10,15 +10,15 @@ function createTable () {
     fi
 
     case $local_tableName in
-        [0-9]*)
-            echo "Table Name Cannot Start With Numbers."
-            ;;
+        [!a-zA-Z]*)
+            echo "Table Name Cannot Start With Special Characters Or Numbers."
+           ;;
         *" "*)
             echo "Table Name Should Not Have Any Spaces."
             ;;
-        *[!a-zA-Z]*)
+        *[!a-z0-9A-Z]*)
             echo "Table Name Cannot Have Special Characters."
-            ;;
+           ;;
         *)
             mkdir "$local_tableName"
             echo "$local_tableName Created Successfully."
@@ -49,7 +49,7 @@ select menu in "Create a Table" "List Tables" "Insert Into Table" "Drop Table" "
     case $REPLY in
         1)
             read -p "Enter the database name: " tableName
-            createDataBase "$tableName"
+            createTable "$tableName"
             ;;
         2)
             if [ -n "$(ls -d database/*/)" ]; then

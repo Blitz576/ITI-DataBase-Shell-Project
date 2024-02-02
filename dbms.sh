@@ -26,13 +26,13 @@ function createDataBase () {
     done
 
     case $local_dbName in
-        [0-9]*)
-            echo "Database Name Cannot Start With Numbers."
-            ;;
+        [!a-zA-Z]*)
+            echo "Database Name Cannot Start With Special Characters or Numbers."
+            ;;    
         *" "*)
             echo "Database Name Should Not Have Any Spaces."
             ;;
-        *[!a-zA-Z]*)
+        *[!a-z0-9A-Z]*)
             echo "Database Name Cannot Have Special Characters."
             ;;
         *)
