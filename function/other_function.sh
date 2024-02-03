@@ -31,11 +31,11 @@ function checkPrimary(){
 
 function dataIntegrity(){
     local dataType=$1
-
-    if [[ $dataType =~ ^[0-9]+$ ]]; then
+    dataType=`echo "$dataType" | tr '[:upper:]' '[:lower:]'`
+    if [ $local_choice = "i" -o $local_choice = "int" ]; then
         return 1;
-    elif [[ -n $dataType && $dataType != " "* ]]; then
-        return 2;
+    elif [ $local_choice = "s" -o $local_choice = "string" ]; then
+         return 2;
     else
          return 0;
     fi

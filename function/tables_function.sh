@@ -1,5 +1,5 @@
 #import main functions
-source ./other_function.sh
+source ../../function/other_function.sh
 
 
 function setTableAttributes() {
@@ -7,7 +7,7 @@ function setTableAttributes() {
   local tableMetaData=$1
   local iterator=0 
   #feilds defination
-  fields=("Feild_Name" "Primary_Constraint" "Data_Type")
+  fields=("Name" "Primary" "DataType")
 
   #write them down to meta data file
   echo ${fields[*]} >> $tableMetaData

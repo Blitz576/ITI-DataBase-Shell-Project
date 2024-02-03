@@ -1,5 +1,5 @@
 #import main functions
-source ./other_function.sh
+source ./function/other_function.sh
 
 
 function createDataBasesDirectory () {
