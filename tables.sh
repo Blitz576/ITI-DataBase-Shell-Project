@@ -7,7 +7,7 @@ PS3="$1 >"
 
 echo "welcome to DataBase $1"
 
-select menu in "Create a Table" "List Tables" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Drop Table" "Back To DataBase main system"; do
+select menu in "Create a Table" "List Tables" "Insert into Table" "Select From Table" "Update Table" "Delete From Table" "Drop Table" "Back To DataBase main system"; do
     case $REPLY in
         1)
             read -p "Enter the table name: " tableName
@@ -37,6 +37,10 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
             read -p "Enter the Table name: " _tableName
             selectFromTable "$_tableName" 
             ;;
+        7)
+            read -p "Enter the Table Name: " _tableName
+            updateTable "$_tableName"
+        ;;    
         *)
             echo "Invalid option. Please choose a number between 1 and 5."
             ;;

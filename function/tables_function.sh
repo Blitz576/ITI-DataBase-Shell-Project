@@ -1,5 +1,5 @@
 #import main functions
-source ./other_function.sh
+source ../../function/other_function.sh
 
 
 function setTableAttributes() {
@@ -112,6 +112,9 @@ function dropTable() {
     echo "$local_TableName deleted successfully"
     
 }
+
+
+#crud operations
 function insertIntoTable(){
   local local_TableName="$1"
     
@@ -176,6 +179,61 @@ for ((i=0; i<$length; i++)); do
     echo "Data inserted successfully into $local_TableName."
 }
 
+function updateTable () {
+    
+    local targetTableName=$1
+    local tableFeildsCount=0
+    #check if the table was found
+     if [ ! -f "$targetTableName" ]; then
+        echo "Table Not Found."
+        return
+    fi
+    
+    local maximumFeilds=`head -1 $targetTableName | awk '{print NF}'` #intial feilds count
+    
+    #detect number of feilds we want to update
+    
+    
+    #check if the number of feilds is correct
+    while [ true ]; do
+      read -p "Enter the number of feilds you want to update" targetFeildsCount
+      if [ $maximumFeilds -lt $targetFeildsCount ]; then
+      echo "number of feilds is greater than the table feilds please try again."
+      continue
+      fi
+     tableFeildsCount=$targetFeildsCount 
+     break
+    done
+
+   local feilds=()
+   local feildsData=() 
+   #input feilds
+   local item=0
+   while [ $item -lt $tableFeildsCount ];do
+   
+   read -p "Enter the $((item+1)) feild name" targetFeildName
+    
+   #check if the feild exist or not 
+   
+   if [ grep -q "\<$targetFeildName\>" "${targetTableName}.meta" ]
+   then
+    feilds[$item]=$targetFeildName
+    read -p "insert the feild data: " feildData
+    
+   else
+    echo "the entered name is not exist please enter the name again..."
+    continue
+   fi
+
+   ((item++))
+   done
+   
+
+}
+
+
+
+
 function selectFromTable()
 {
     local local_TableName="$1"
@@ -208,4 +266,5 @@ function selectFromTable()
         cat "$local_TableName"
     
     fi
+   done
 }
