@@ -112,3 +112,69 @@ function dropTable() {
     echo "$local_TableName deleted successfully"
     
 }
+function insertIntoTable(){
+  local local_TableName="$1"
+    
+    if [ ! -f "$local_TableName" ]; then
+        echo "Table Not Found."
+        return
+    fi
+    
+    local metaFile="${local_TableName}.meta"
+    local File="${locale_TableName}"
+
+    if [ ! -f "$metaFile" ]; then
+        echo "$local_TableName Table not found . please create it first or choose another table ."
+        return
+    fi
+    
+    local fields=($(grep -E 'INT|STRING' $metaFile | awk '{print $1}'))
+    local fields_primary=($(grep -E 'INT|STRING' $metaFile | awk '{print $2}'))
+    local fields_type=($(grep -E 'INT|STRING' $metaFile | awk '{print $3}'))
+
+    local insertFields=""
+
+    length=${#fields[@]}
+
+for ((i=0; i<$length; i++)); do
+        
+    # if [ "$fields_primary" == "Not" ]
+    if [[ ${fields_type[i]} == "INT" ]]; then
+        while true; do
+            read -p "Enter int number for ${fields[i]}: " value
+
+            if [[ "$value" =~ ^[0-9]+$ ]]; then
+                break  # Exit the loop if the value is an integer
+            else
+                echo "Invalid input. You must enter an integer."
+            fi
+
+        done
+    elif [[ ${fields_type[i]} == "STRING" ]]; then
+        while true; do
+            read -p "Enter string for ${fields[i]}: " value
+
+            if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
+                break  # Exit the loop if the value is a string
+            else
+                echo "Invalid input. You must enter a string."
+            fi
+
+        done
+    fi
+
+        local uniqness=${fields_primary[i]}
+
+        # Append fields and values for insertion
+        insertFields+="${fields[i]} "
+        insertFields+="'$value' "
+        insertFields+="'$uniqness' " 
+ 
+
+    done
+    
+    # Insert the data into the table
+    echo "$insertFields" >> "$local_TableName"
+    
+    echo "Data inserted successfully into $local_TableName."
+}

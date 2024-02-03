@@ -26,8 +26,8 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
             fi
             ;;
         3)
-            read -p "Enter the database name: " _tableName
-            connectToTable "$_tableName"
+            read -p "Enter the table name: " _tableName
+            insertIntoTable "$_tableName"
             ;;
         4)
             read -p "Enter the database name: " _tableName
