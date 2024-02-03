@@ -10,7 +10,7 @@ echo "welcome to DataBase $1"
 select menu in "Create a Table" "List Tables" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Drop Table" "Back To DataBase main system"; do
     case $REPLY in
         1)
-            read -p "Enter the database name: " tableName
+            read -p "Enter the table name: " tableName
             createTable "$tableName" "Table"
             ;;
         2)
@@ -26,12 +26,16 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
             insertIntoTable "$_tableName"
             ;;
         4)
-            read -p "Enter the database name: " _tableName
+            read -p "Enter the table name: " _tableName
             dropDataTable "$_tableName"    
             ;;
         5)
             echo "Welcome to system ."
             break
+            ;;
+        6)
+            read -p "Enter the Table name: " _tableName
+            selectFromTable "$_tableName" 
             ;;
         *)
             echo "Invalid option. Please choose a number between 1 and 5."

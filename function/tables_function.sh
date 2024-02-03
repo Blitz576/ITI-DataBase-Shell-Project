@@ -122,11 +122,7 @@ function insertIntoTable(){
     
     local metaFile="${local_TableName}.meta"
     local File="${locale_TableName}"
-
-    if [ ! -f "$metaFile" ]; then
-        echo "$local_TableName Table not found . please create it first or choose another table ."
-        return
-    fi
+    
     
     local fields=($(grep -E 'INT|STRING' $metaFile | awk '{print $1}'))
     local fields_primary=($(grep -E 'INT|STRING' $metaFile | awk '{print $2}'))
@@ -178,4 +174,38 @@ for ((i=0; i<$length; i++)); do
     echo "-------------------" >> "$local_TableName"
 
     echo "Data inserted successfully into $local_TableName."
+}
+
+function selectFromTable()
+{
+    local local_TableName="$1"
+    while true; do
+
+    if [ ! -f "$local_TableName" ]; then
+        echo "Table Not Found."
+        return
+    fi
+
+    local metaFile="${local_TableName}.meta"
+    local columns=($(grep -E 'INT|STRING' $metaFile |awk '{print $1}'))
+
+
+    echo "Available Columns: ${columns[*]}"
+
+    while true; do
+    read -p "Enter column name to select (or enter * to select all): " selectedColumn
+   
+    if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " ]]; then
+        echo "Invalid column name. Please select a valid column."
+    else
+       break
+    fi
+    done
+
+    echo "Selected Data from $local_TableName:"
+
+    if [ "$selectedColumn" == "*" ]; then
+        cat "$local_TableName"
+    
+    fi
 }
