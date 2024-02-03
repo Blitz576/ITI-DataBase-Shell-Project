@@ -1,9 +1,6 @@
 #!/bin/bash
 
-echo "the file path is" 
-echo "######"
-echo $PWD
-echo "#####"
+
 
 #import data base functions
 source ./function/dbms_function.sh

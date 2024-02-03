@@ -1,5 +1,5 @@
 #import main functions
-source ../../function/other_function.sh
+source ./other_function.sh
 
 
 function setTableAttributes() {
@@ -7,7 +7,7 @@ function setTableAttributes() {
   local tableMetaData=$1
   local iterator=0 
   #feilds defination
-  fields=("Name" "Primary" "DataType")
+  fields=("Feild_Name" "Primary_Constraint" "Data_Type")
 
   #write them down to meta data file
   echo ${fields[*]} >> $tableMetaData
@@ -137,11 +137,12 @@ function insertIntoTable(){
     length=${#fields[@]}
 
 for ((i=0; i<$length; i++)); do
-        
+    local uniqness=${fields_primary[i]}
+
     # if [ "$fields_primary" == "Not" ]
     if [[ ${fields_type[i]} == "INT" ]]; then
         while true; do
-            read -p "Enter int number for ${fields[i]}: " value
+            read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
             if [[ "$value" =~ ^[0-9]+$ ]]; then
                 break  # Exit the loop if the value is an integer
@@ -163,18 +164,18 @@ for ((i=0; i<$length; i++)); do
         done
     fi
 
-        local uniqness=${fields_primary[i]}
 
-        # Append fields and values for insertion
         insertFields+="${fields[i]} "
+        
         insertFields+="'$value' "
-        insertFields+="'$uniqness' " 
+
  
 
     done
     
     # Insert the data into the table
     echo "$insertFields" >> "$local_TableName"
-    
+    echo "-------------------" >> "$local_TableName"
+
     echo "Data inserted successfully into $local_TableName."
 }

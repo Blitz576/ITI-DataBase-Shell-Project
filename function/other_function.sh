@@ -32,9 +32,9 @@ function checkPrimary(){
 function dataIntegrity(){
     local dataType=$1
     dataType=`echo "$dataType" | tr '[:upper:]' '[:lower:]'`
-    if [ $local_choice = "i" -o $local_choice = "int" ]; then
+    if [ $dataType = "i" -o $dataType = "int" ]; then
         return 1;
-    elif [ $local_choice = "s" -o $local_choice = "string" ]; then
+    elif [ $dataType = "s" -o $dataType = "string" ]; then
          return 2;
     else
          return 0;
