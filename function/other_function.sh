@@ -41,3 +41,20 @@ function dataIntegrity(){
     fi
        
 }
+
+check_primary_key() {
+
+    local primary_key="$1"
+    local arr=("$@")   
+    unset arr[0]  
+
+    # Check if the primary key exists in the file
+    for element in "${arr[@]}"; do
+
+          if [ "$element" == "$primary_key" ]; then
+                 echo "Primary key '$primary_key' exists."
+         else
+                 echo "Primary key '$primary_key' does not exist ."
+          fi
+    done
+}

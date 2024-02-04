@@ -149,7 +149,11 @@ function insertIntoTable(){
         while true; do
             read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
+           
             if [[ "$value" =~ ^[0-9]+$ ]]; then
+                if [[ ${fields_primary[i]} == "PRIMARY" ]]; then
+                check_primary_key "$value" "${fields[@]}" 
+                fi
                 break  # Exit the loop if the value is an integer
             else
                 echo "Invalid input. You must enter an integer."
