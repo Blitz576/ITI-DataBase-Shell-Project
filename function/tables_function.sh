@@ -38,7 +38,7 @@ function setTableAttributes() {
     #check if the field Primary constraint was entered or not
     local feildConstraint=0
     if [ $fpconstraint -eq 0 ]; then
-    if [ priamryChecker -eq 0 ]; then 
+    if [ $priamryChecker -eq 0 ]; then 
         read -p "Primary(p) or Not(n) : " feildConstraint
       else
         feildConstraint="Not"  
@@ -81,8 +81,6 @@ function setTableAttributes() {
    fname=0
    fpconstraint=0
    fdatatype=0
-   priamryChecker=0
-  
 
   #increase the iterator
   ((iterator++))
@@ -143,7 +141,7 @@ function insertIntoTable(){
 
     length=${#fields[@]}
 
-for ((i=0; i<$length; i++)); do
+   for ((i=0; i<$length; i++)); do
     local uniqness=${fields_primary[i]}
 
     # if [ "$fields_primary" == "Not" ]
@@ -229,7 +227,7 @@ function updateTable () {
     read -p "insert the new feild data: " feildData
 
     #check data primary
-
+    
     #check data integrity
     dataIntegrity `awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta"
 `
@@ -277,11 +275,12 @@ function updateTable () {
       fi
 
    else
-    sed "s/${}/${}" $targetTableName
+    echo "the data you entered is not exist plaese try the steps from the begining..."
+    continue;
    fi
         
    else
-    echo "the entered name is not exist please enter the name again..."
+    echo "the entered data is not exist please enter the name again..."
     continue
    fi
 
@@ -290,6 +289,37 @@ function updateTable () {
    done
    
 
+}
+
+
+
+function deleteFromTable () {
+    local targetTableName=$1  
+
+    # Check if the table exists or not 
+    if [ -f "$targetTableName" ]; then
+        local choice=0
+        read -p "Delete all (press 0) or enter specific id (press 1): " choice
+
+        # Delete all
+        if [ $choice -eq 0 ]; then
+            echo -n "" > "$targetTableName"
+            echo "Deleted successfully"
+        elif [ $choice -eq 1 ]; then
+            # Delete by id
+            local pk=0
+            read -p "Enter the primary key: " pk
+
+            # Use sed to delete the row where the primary key exists
+            sed -i "/$pk/d" "$targetTableName"
+            echo "Deleted row with primary key $pk"
+        else
+            echo "Wrong choice. Please enter a correct number."
+        fi
+    
+    else
+        echo "Table does not exist. Please try again ..."
+    fi
 }
 
 
@@ -329,3 +359,5 @@ function selectFromTable()
     fi
    done
 }
+
+
