@@ -114,7 +114,6 @@ function dropTable() {
 }
 
 
-#crud operations
 function insertIntoTable(){
   local local_TableName="$1"
     
@@ -197,8 +196,8 @@ function updateTable () {
     #check if the number of feilds is correct
     while [ true ]; do
       read -p "Enter the number of feilds you want to update" targetFeildsCount
-      if [ $maximumFeilds -lt $targetFeildsCount ]; then
-      echo "number of feilds is greater than the table feilds please try again."
+      if [ $maximumFeilds -lt $targetFeildsCount -o $targetFeildsCount -eq 0 -o $targetFeildsCount -lt 0]; then
+      echo "wrong number of feilds it may be greater than the table feilds please try again."
       continue
       fi
      tableFeildsCount=$targetFeildsCount 
@@ -218,12 +217,64 @@ function updateTable () {
    if [ grep -q "\<$targetFeildName\>" "${targetTableName}.meta" ]
    then
     feilds[$item]=$targetFeildName
-    read -p "insert the feild data: " feildData
-    
+    read -p "insert the new feild data: " feildData
+
+    #check data primary
+
+    #check data integrity
+    dataIntegrity `awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta"
+`
+   local validData=0
+   local returnDataIntegrity=$?
+   
+   if [ $returnDataIntegrity -eq 1 ]; then
+     
+     if [[ $data =~ ^[0-9]+$ ]]
+     then
+        validData=1
+     else
+        validData=0
+     fi
+     
+   elif [ $returnDataIntegrity -eq 2 ]; then
+     validData=1
+   else
+     validData=0
+   fi
+   
+   
+   if [ validData -eq 1 ]
+   then
+      read -p "enter the data you want to replace with: " oldData
+      
+      #check if the data Exist or not 
+      if [ grep -q "\<$oldData\>" "${targetTableName}" ]; then
+        read -p "enter id or data on where to reaplce( if you do not want that option press '0' ): " specificData
+        
+        if [ specificData -eq 0 ]; then
+           sed -n "s/${oldData}/${feildData}/g" ${targetTableName}
+        elif [ grep -q "\<$oldData\>" "${targetTableName}" ]; then
+           
+        else
+           echo "the data you entered is not exist plaese try the steps from the begining..."
+           continue;
+        fi
+        
+        
+        else
+        echo "the data you entered is not exist plaese try the steps from the begining..."
+        continue;    
+      fi
+
+   else
+    sed "s/${}/${}" $targetTableName
+   fi
+        
    else
     echo "the entered name is not exist please enter the name again..."
     continue
    fi
+
 
    ((item++))
    done
