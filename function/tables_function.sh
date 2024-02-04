@@ -235,6 +235,12 @@ function updateTable () {
     #check data integrity
     dataIntegrity `awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta"
 `
+   
+
+  local feildIndex=`awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta"
+`
+
+
    local validData=0
    local returnDataIntegrity=$?
    
@@ -263,10 +269,14 @@ function updateTable () {
         read -p "enter id or data on where to reaplce( if you do not want that option press '0' ): " specificData
         
         if [ specificData -eq 0 ]; then
-           sed -n "s/${oldData}/${feildData}/g" ${targetTableName}  #update to all data without specific id
+           # Replace oldData with feildData within the feild feildIndex
+           awk -v fieldIndex="$feildIndex" -v newData="$feildData" -v oldData="$oldData" '{{for (i=1; i<=NF; i++) {if ($i==oldData && fieldIndex==i) $i=newData} print }} ' "$targetTableName" > temp && mv temp "$targetTableName" 
         elif [ grep -q "\<$specificData\>" "${targetTableName}" ]; then
-           # Replace oldData with feildData only in the row where specificData is found
-          sed -i "/$specificData/s/$oldData/$feildData/g" "${targetTableName}"
+          #find the index of the row
+          local rowIndex=`awk -v pattern="$specificData" '{for (i=1; i<=NF; i++) {if ($i == pattern) {print NR; exit}}}' $targetTableName`
+              
+          # Replace oldData with feildData within the feild feildIndex on the row of Specific Data
+            awk -v rowIndex=$rowIndex -v fieldIndex="$feildIndex" -v newData="$feildData" -v oldData="$oldData" '{if (rowIndex==NR){for (i=1; i<=NF; i++) {if ($i==oldData && fieldIndex==i) $i=newData} print }} ' "$targetTableName" |cat > $targetTableName
         else
            echo "the data you entered is not exist plaese try the steps from the begining..."
            continue;
@@ -312,8 +322,8 @@ function deleteFromTable () {
         elif [ $choice -eq 1 ]; then
             # Delete by id
             local pk=0
-            read -p "Enter the primary key: " pk
-
+            read -p "Enter the primary key for the row you want to delete from: " pk
+            
             # Use sed to delete the row where the primary key exists
             sed -i "/$pk/d" "$targetTableName"
             echo "Deleted row with primary key $pk"
