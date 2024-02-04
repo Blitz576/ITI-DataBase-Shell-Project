@@ -16,9 +16,10 @@ function setTableAttributes() {
   local fname=0
   local fpconstraint=0
   local fdatatype=0
-
+  local priamryChecker=0
   read -p "Enter the number of feilds: " feildCount
  
+  
   while [ $iterator -lt $feildCount ]; do
    #check if the field name was entered or not
     if [ $fname -eq 0 ]; then
@@ -35,13 +36,19 @@ function setTableAttributes() {
     fi
 
     #check if the field Primary constraint was entered or not
+    local feildConstraint=0
     if [ $fpconstraint -eq 0 ]; then
-
+    if [ priamryChecker -eq 0 ]; then 
         read -p "Primary(p) or Not(n) : " feildConstraint
+      else
+        feildConstraint="Not"  
+    fi
+            
         checkPrimary "$feildConstraint"
         local returnCheckPrimary=$?
         if [ $returnCheckPrimary -eq 1 ]; then
           fields[1]="PRIMARY"
+          priamryChecker=1
         elif [ $returnCheckPrimary -eq 2 ]; then
           fields[1]="NOT"
         else
@@ -71,9 +78,11 @@ function setTableAttributes() {
   echo ${fields[*]} >> $tableMetaData
   
   #reset the values of checkers
-  local fname=0
-  local fpconstraint=0
-  local fdatatype=0
+   fname=0
+   fpconstraint=0
+   fdatatype=0
+   priamryChecker=0
+  
 
   #increase the iterator
   ((iterator++))
@@ -252,9 +261,10 @@ function updateTable () {
         read -p "enter id or data on where to reaplce( if you do not want that option press '0' ): " specificData
         
         if [ specificData -eq 0 ]; then
-           sed -n "s/${oldData}/${feildData}/g" ${targetTableName}
-        elif [ grep -q "\<$oldData\>" "${targetTableName}" ]; then
-           
+           sed -n "s/${oldData}/${feildData}/g" ${targetTableName}  #update to all data without specific id
+        elif [ grep -q "\<$specificData\>" "${targetTableName}" ]; then
+           # Replace oldData with feildData only in the row where specificData is found
+          sed -i "/$specificData/s/$oldData/$feildData/g" "${targetTableName}"
         else
            echo "the data you entered is not exist plaese try the steps from the begining..."
            continue;
