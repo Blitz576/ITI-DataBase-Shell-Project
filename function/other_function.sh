@@ -58,3 +58,12 @@ check_primary_key() {
           fi
     done
 }
+
+function getFeildIndex ()
+{
+   local targetTableName=$1
+   local feildName=$2
+   local feildIndex=`awk -v pattern="$feildName" '$1 == pattern {print NR; exit}' "${targetTableName}.meta"`
+   feildIndex=$((feildIndex - 1))
+   return $feildIndex;
+}

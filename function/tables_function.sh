@@ -366,6 +366,9 @@ function selectFromTable()
 
     if [ "$selectedColumn" == "*" ]; then
         cat "$local_TableName"
+    else
+      getFeildIndex "$local_TableName" "$selectedColumn"
+      awk -v col="$?" '{print $col}' $local_TableName
     
     fi
    
