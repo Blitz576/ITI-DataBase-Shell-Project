@@ -149,11 +149,10 @@ function insertIntoTable(){
         while true; do
             read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
-           
+            # checkPrimary awk -v pattern="$targetFeildName" '$1 == pattern {print $2 }' "${targetTableName}.meta"
+            # if [ $? -eq 1 ]; then
+
             if [[ "$value" =~ ^[0-9]+$ ]]; then
-                if [[ ${fields_primary[i]} == "PRIMARY" ]]; then
-                check_primary_key "$value" "${fields[@]}" 
-                fi
                 break  # Exit the loop if the value is an integer
             else
                 echo "Invalid input. You must enter an integer."
@@ -174,7 +173,6 @@ function insertIntoTable(){
     fi
 
 
-        insertFields+="${fields[i]} "
         
         insertFields+="'$value' "
 
@@ -342,7 +340,6 @@ function deleteFromTable () {
 function selectFromTable()
 {
     local local_TableName="$1"
-    while true; do
 
     if [ ! -f "$local_TableName" ]; then
         echo "Table Not Found."
@@ -371,7 +368,7 @@ function selectFromTable()
         cat "$local_TableName"
     
     fi
-   done
+   
 }
 
 
