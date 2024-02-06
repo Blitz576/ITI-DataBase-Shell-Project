@@ -1,0 +1,4 @@
+Feild_Name Primary_Constraint Data_Type
+ageNum PRIMARY INT
+ageStr NOT STRING
+agee NOT INT

@@ -130,28 +130,32 @@ function insertIntoTable(){
     fi
     
     local metaFile="${local_TableName}.meta"
-    local File="${locale_TableName}"
     
     
     local fields=($(grep -E 'INT|STRING' $metaFile | awk '{print $1}'))
     local fields_primary=($(grep -E 'INT|STRING' $metaFile | awk '{print $2}'))
     local fields_type=($(grep -E 'INT|STRING' $metaFile | awk '{print $3}'))
 
-    local insertFields=""
-
+    local my_array=()
     length=${#fields[@]}
 
    for ((i=0; i<$length; i++)); do
     local uniqness=${fields_primary[i]}
 
-    # if [ "$fields_primary" == "Not" ]
     if [[ ${fields_type[i]} == "INT" ]]; then
         while true; do
             read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
-            # checkPrimary awk -v pattern="$targetFeildName" '$1 == pattern {print $2 }' "${targetTableName}.meta"
-            # if [ $? -eq 1 ]; then
-
+            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
+               searchElementInColumn $i $value $local_TableName
+               result=$?
+              if [ $result -eq 1 ]; then
+                echo "Element found."
+                break 2
+              else
+                echo "Element not found."
+              fi
+            fi
             if [[ "$value" =~ ^[0-9]+$ ]]; then
                 break  # Exit the loop if the value is an integer
             else
@@ -174,14 +178,13 @@ function insertIntoTable(){
 
 
         
-        insertFields+="'$value' "
-
+    my_array+=("$value")
  
 
     done
     
     # Insert the data into the table
-    echo "$insertFields" >> "$local_TableName"
+    echo ${my_array[*]} >> "$local_TableName"
     echo "-------------------" >> "$local_TableName"
 
     echo "Data inserted successfully into $local_TableName."
@@ -199,27 +202,8 @@ function updateTable () {
         return
     fi
     
-    local maximumFeilds=$(head -1 $targetTableName | awk '{print NF}') #intial feilds count
-    
-    #detect number of feilds we want to update
-    
-    
-    #check if the number of feilds is correct
-    while [ true ]; do
-      read -p "Enter the number of feilds you want to update: " targetFeildsCount
-      if [ $maximumFeilds -lt $targetFeildsCount -o $targetFeildsCount -eq 0 -o $targetFeildsCount -lt 0 ]; then
-      echo "wrong number of feilds it may be greater than the table feilds please try again."
-      continue
-      fi
-     tableFeildsCount=$targetFeildsCount 
-     break
-    done
-
-   #input feilds
-   local item=0
-   while [ $item -lt $tableFeildsCount ];do
    
-   read -p "Enter the $((item+1)) feild name: " targetFeildName
+   read -p "Enter the feild name: " targetFeildName
     
    #check if the feild exist or not 
    
@@ -304,7 +288,7 @@ function updateTable () {
               specificValidData=0
             fi
             if [ $specificValidData -eq 1 ];then
-               awk -v feildIndex="$pkColumn" -v specificData="$feildData" '{
+              local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
                 for (i=1; i<=NF; i++) { 
                     
                     if ($i == specificData) {
@@ -312,14 +296,23 @@ function updateTable () {
                         exit
                     }
                 }
-             } ' "$targetTableName"  
+             } ' "$targetTableName")  
               
+             echo $pkRow 
+             ((feildIndex--))
+             awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
+                for (i=1; i<=NF; i++) { 
+                    
+                    if (i == feildIndex && pkRow == NR) {
+                        $i=newData
+                    }
+                }
+            print } ' "$targetTableName" 
            echo "sucessfully updated"
 
 
           else
             echo "Data Mis Match With The Primary Key Please Try Again"
-            continue
           fi
                         
         
@@ -327,17 +320,12 @@ function updateTable () {
         
         
         else
-        echo "the data you entered is not exist plaese try the steps from the begining..."
-        continue;    
+        echo "the data you entered is not exist plaese try the steps from the begining..."    
       fi     
    else
     echo "the entered data is not exist please enter the name again..."
-    continue
    fi
 
-
-   ((item++))
-   done
    
 
 }
