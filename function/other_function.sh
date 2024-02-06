@@ -68,6 +68,14 @@ function getFeildIndex ()
    return $feildIndex;
 }
 
+
+function getPrimaryFeildIndex(){
+   local targetTableName=$1
+   local primaryFeildName=`awk -v pattern="PRIMARY" '$2 == pattern {print $1; exit}' "${targetTableName}.meta"` 
+   getFeildIndex "$targetTableName" "$primaryFeildName"
+   return $? 
+}
+
 function searchElementInColumn() {
     local column_number=$1
     local element_to_search=$2

@@ -193,6 +193,8 @@ function insertIntoTable(){
     echo "Data inserted successfully into $local_TableName."
 }
 
+
+
 function updateTable () {
     
     local targetTableName=$1
@@ -203,112 +205,133 @@ function updateTable () {
         return
     fi
     
-    local maximumFeilds=`head -1 $targetTableName | awk '{print NF}'` #intial feilds count
-    
-    #detect number of feilds we want to update
-    
-    
-    #check if the number of feilds is correct
-    while [ true ]; do
-      read -p "Enter the number of feilds you want to update" targetFeildsCount
-      if [ $maximumFeilds -lt $targetFeildsCount -o $targetFeildsCount -eq 0 -o $targetFeildsCount -lt 0]; then
-      echo "wrong number of feilds it may be greater than the table feilds please try again."
-      continue
-      fi
-     tableFeildsCount=$targetFeildsCount 
-     break
-    done
-
-   local feilds=()
-   local feildsData=() 
-   #input feilds
-   local item=0
-   while [ $item -lt $tableFeildsCount ];do
    
-   read -p "Enter the $((item+1)) feild name" targetFeildName
+   read -p "Enter the feild name: " targetFeildName
     
    #check if the feild exist or not 
    
-   if [ grep -q "\<$targetFeildName\>" "${targetTableName}.meta" ]
+   if  grep -q "\<$targetFeildName\>" "${targetTableName}.meta" ;
    then
     feilds[$item]=$targetFeildName
-    read -p "insert the new feild data: " feildData
-
+    local feildData=0
+    read -p "insert the new data: " feildData 
     #check data primary
-    
+    getPrimaryFeildIndex "$targetTableName"
+    local pkColumn=$? 
+    echo $pkColumn
     #check data integrity
-    dataIntegrity `awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta"
-`
+    dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
+    local returnDataIntegrity=$?
+    local validData=0
    
 
-  local feildIndex=`awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta"
-`
 
-
-   local validData=0
-   local returnDataIntegrity=$?
    
    if [ $returnDataIntegrity -eq 1 ]; then
      
-     if [[ $data =~ ^[0-9]+$ ]]
+     if [[ $feildData =~ ^[0-9]+$ ]]
      then
+        echo "yes"
         validData=1
      else
+       echo "no"
         validData=0
-     fi
+    fi    
+   fi
      
-   elif [ $returnDataIntegrity -eq 2 ]; then
-     validData=1
-   else
+   if [ $returnDataIntegrity -eq 2 ]; then
+     if [ ${#feildData} -lt 1 ];then
      validData=0
+   else
+     validData=1
+     fi
    fi
    
+  local feildIndex=$(awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta")
    
-   if [ validData -eq 1 ]
+   if [ $validData -eq 1 ]
    then
-      read -p "enter the data you want to replace with: " oldData
-      
       #check if the data Exist or not 
-      if [ grep -q "\<$oldData\>" "${targetTableName}" ]; then
-        read -p "enter id or data on where to reaplce( if you do not want that option press '0' ): " specificData
+        read -p "enter id or pirmary key data( if you do not want that option press '.' ): " specificData
         
-        if [ specificData -eq 0 ]; then
+        if [ $specificData = "." ]; then
            # Replace oldData with feildData within the feild feildIndex
-           awk -v fieldIndex="$feildIndex" -v newData="$feildData" -v oldData="$oldData" '{{for (i=1; i<=NF; i++) {if ($i==oldData && fieldIndex==i) $i=newData} print }} ' "$targetTableName" > temp && mv temp "$targetTableName" 
-        elif [ grep -q "\<$specificData\>" "${targetTableName}" ]; then
-          #find the index of the row
-          local rowIndex=`awk -v pattern="$specificData" '{for (i=1; i<=NF; i++) {if ($i == pattern) {print NR; exit}}}' $targetTableName`
-              
-          # Replace oldData with feildData within the feild feildIndex on the row of Specific Data
-            awk -v rowIndex=$rowIndex -v fieldIndex="$feildIndex" -v newData="$feildData" -v oldData="$oldData" '{if (rowIndex==NR){for (i=1; i<=NF; i++) {if ($i==oldData && fieldIndex==i) $i=newData} print }} ' "$targetTableName" |cat > $targetTableName
+          ((feildIndex--))
+          
+          touch ${targetTableName}.meta_temp
+          awk -v feildIndex="$feildIndex" -v newData="$feildData" '{
+              for (i=1; i<=NF; i++) { 
+                  if (i == feildIndex )
+                      $i=newData
+              }
+              print
+          }' "$targetTableName" > ${targetTableName}.meta_temp
+          cat ${targetTableName}.meta_temp > ${targetTableName}
+          rm ${targetTableName}.meta_temp
+
+           echo "updated sucessfully"
         else
-           echo "the data you entered is not exist plaese try the steps from the begining..."
-           continue;
+          #check if the data integrity for the primary data entered
+          dataIntegrity `awk -v pattern="PRIMARY" '$2 == pattern {print $3; exit}' "${targetTableName}.meta"` 
+          local primaryKeyDataType=$?
+          local specificValidData=0
+               #validate Data
+               if [ $primaryKeyDataType -eq 1 ]; then
+     
+              if [[ $specificData =~ ^[0-9]+$ ]]
+              then
+                  specificValidData=1
+              else
+                  specificValidData=0
+              fi
+              
+            elif [ $primaryKeyDataType -eq 2 ]; then
+              specificValidData=1
+            else
+              specificValidData=0
+            fi
+            if [ $specificValidData -eq 1 ];then
+              local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
+                for (i=1; i<=NF; i++) { 
+                    
+                    if ($i == specificData) {
+                        print NR
+                        exit
+                    }
+                }
+             } ' "$targetTableName")  
+              
+             echo $pkRow 
+             ((feildIndex--))
+             awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
+                for (i=1; i<=NF; i++) { 
+                    
+                    if (i == feildIndex && pkRow == NR) {
+                        $i=newData
+                    }
+                }
+            print } ' "$targetTableName" 
+           echo "sucessfully updated"
+
+
+          else
+            echo "Data Mis Match With The Primary Key Please Try Again"
+          fi
+                        
+        
         fi
         
         
         else
-        echo "the data you entered is not exist plaese try the steps from the begining..."
-        continue;    
-      fi
-
-   else
-    echo "the data you entered is not exist plaese try the steps from the begining..."
-    continue;
-   fi
-        
+        echo "the data you entered is not exist plaese try the steps from the begining..."    
+      fi     
    else
     echo "the entered data is not exist please enter the name again..."
-    continue
    fi
 
-
-   ((item++))
-   done
    
 
 }
-
 
 
 function deleteFromTable () {
@@ -379,5 +402,3 @@ function selectFromTable()
     fi
    
 }
-
-
