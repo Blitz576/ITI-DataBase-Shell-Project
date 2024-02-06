@@ -30,7 +30,7 @@ select menu in "Create a Table" "List Tables" "Insert into Table" "Select From T
             dropDataTable "$_tableName"    
             ;;
         5)
-            echo "Welcome to system ."
+            
             break
             ;;
         6)
