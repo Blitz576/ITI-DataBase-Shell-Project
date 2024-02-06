@@ -147,17 +147,14 @@ function insertIntoTable(){
             read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
             if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
-               searchElementInColumn $i $value $local_TableName
-               result=$?
-              if [ $result -eq 1 ]; then
-                echo "Element found."
+               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
+              if [ $? -eq 1 ]; then
+                echo "Primary key must be unique and this value already exit , please enter another value"
                 break 2
-              else
-                echo "Element not found."
               fi
             fi
             if [[ "$value" =~ ^[0-9]+$ ]]; then
-                break  # Exit the loop if the value is an integer
+                break  
             else
                 echo "Invalid input. You must enter an integer."
             fi
@@ -166,9 +163,17 @@ function insertIntoTable(){
     elif [[ ${fields_type[i]} == "STRING" ]]; then
         while true; do
             read -p "Enter string for ${fields[i]}: " value
+            
+            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
+               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
+              if [ $? -eq 1 ]; then
+                echo "Primary key must be unique and this value already exit , please enter another value"
+                break 2
+              fi
+            fi
 
             if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
-                break  # Exit the loop if the value is a string
+                break 
             else
                 echo "Invalid input. You must enter a string."
             fi
@@ -179,8 +184,6 @@ function insertIntoTable(){
 
         
     my_array+=("$value")
- 
-
     done
     
     # Insert the data into the table
