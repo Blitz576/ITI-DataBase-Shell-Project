@@ -67,3 +67,13 @@ function getFeildIndex ()
    feildIndex=$((feildIndex - 1))
    return $feildIndex;
 }
+
+function searchElementInColumn() {
+    local column_number=$1
+    local element_to_search=$2
+    local data_file=$3
+    local found=0 
+    awk -v col="$column_number" -v search="$element_to_search" '{ if($col == search) {found=1; exit} }' "$data_file"
+    echo $found
+    return $found
+}

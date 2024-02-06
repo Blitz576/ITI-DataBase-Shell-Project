@@ -130,28 +130,32 @@ function insertIntoTable(){
     fi
     
     local metaFile="${local_TableName}.meta"
-    local File="${locale_TableName}"
     
     
     local fields=($(grep -E 'INT|STRING' $metaFile | awk '{print $1}'))
     local fields_primary=($(grep -E 'INT|STRING' $metaFile | awk '{print $2}'))
     local fields_type=($(grep -E 'INT|STRING' $metaFile | awk '{print $3}'))
 
-    local insertFields=""
-
+    local my_array=()
     length=${#fields[@]}
 
    for ((i=0; i<$length; i++)); do
     local uniqness=${fields_primary[i]}
 
-    # if [ "$fields_primary" == "Not" ]
     if [[ ${fields_type[i]} == "INT" ]]; then
         while true; do
             read -p "Enter int number for ${fields[i]} ($uniqness): " value
 
-            # checkPrimary awk -v pattern="$targetFeildName" '$1 == pattern {print $2 }' "${targetTableName}.meta"
-            # if [ $? -eq 1 ]; then
-
+            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
+               searchElementInColumn $i $value $local_TableName
+               result=$?
+              if [ $result -eq 1 ]; then
+                echo "Element found."
+                break 2
+              else
+                echo "Element not found."
+              fi
+            fi
             if [[ "$value" =~ ^[0-9]+$ ]]; then
                 break  # Exit the loop if the value is an integer
             else
@@ -174,14 +178,13 @@ function insertIntoTable(){
 
 
         
-        insertFields+="'$value' "
-
+    my_array+=("$value")
  
 
     done
     
     # Insert the data into the table
-    echo "$insertFields" >> "$local_TableName"
+    echo ${my_array[*]} >> "$local_TableName"
     echo "-------------------" >> "$local_TableName"
 
     echo "Data inserted successfully into $local_TableName."
