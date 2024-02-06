@@ -121,78 +121,82 @@ function dropTable() {
 }
 
 
-function insertIntoTable(){
-  local local_TableName="$1"
-    
+function insertIntoTable() {
+    local local_TableName="$1"
+
     if [ ! -f "$local_TableName" ]; then
         echo "Table Not Found."
         return
     fi
-    
+
     local metaFile="${local_TableName}.meta"
-    
-    
-    local fields=($(grep -E 'INT|STRING' $metaFile | awk '{print $1}'))
-    local fields_primary=($(grep -E 'INT|STRING' $metaFile | awk '{print $2}'))
-    local fields_type=($(grep -E 'INT|STRING' $metaFile | awk '{print $3}'))
+
+    local fields=($(grep -E 'INT|STRING' "$metaFile" | awk '{print $1}'))
+    local fields_primary=($(grep -E 'INT|STRING' "$metaFile" | awk '{print $2}'))
+    local fields_type=($(grep -E 'INT|STRING' "$metaFile" | awk '{print $3}'))
 
     local my_array=()
-    length=${#fields[@]}
+    local length=${#fields[@]}
+    local inserted=0
 
-   for ((i=0; i<$length; i++)); do
-    local uniqness=${fields_primary[i]}
+    for ((i=0; i<$length; i++)); do
+        local uniqness=${fields_primary[i]}
 
-    if [[ ${fields_type[i]} == "INT" ]]; then
-        while true; do
-            read -p "Enter int number for ${fields[i]} ($uniqness): " value
+        if [[ ${fields_type[i]} == "INT" ]]; then
+            while true; do
+              read -p "Enter int number for ${fields[i]} ($uniqness): " value
+              if [[ "$value" =~ ^[0-9]+$ ]]; then
+                if [[ ${fields_primary[i]} == "PRIMARY" ]]; then 
+                    searchElementInColumn $((i + 1)) "$value" "$local_TableName"
+                    
+                    if [ $? -eq 1 ]; then
+                        echo "Primary key must be unique, and this value already exists. Please enter another value."
 
-            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
-               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
-              if [ $? -eq 1 ]; then
-                echo "Primary key must be unique and this value already exit , please enter another value"
-                break 2
+                    else
+                        inserted=1
+                        break 
+                    fi
+                    else
+                       inserted=1
+                       break
+                fi
+                    
+              else
+                    echo "Invalid input. You must enter an integer."
               fi
-            fi
-            if [[ "$value" =~ ^[0-9]+$ ]]; then
-                break  
-            else
-                echo "Invalid input. You must enter an integer."
-            fi
+            done
+        elif [[ ${fields_type[i]} == "STRING" ]]; then
+            while true; do
+                read -p "Enter string for ${fields[i]}: " value
+                if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
+                if [[ ${fields_primary[i]} == "PRIMARY" ]]; then 
+                    searchElementInColumn $((i + 1)) "$value" "$local_TableName"
+                    
+                    if [ $? -eq 1 ]; then
+                        echo "Primary key must be unique, and this value already exists. Please enter another value."
+                    else
+                        inserted=1
+                        break
+                    fi
+                else
+                      inserted=1
+                      break
+                fi
+                else
+                    echo "Invalid input. You must enter a string."
+                fi
+            done
+        fi
 
-        done
-    elif [[ ${fields_type[i]} == "STRING" ]]; then
-        while true; do
-            read -p "Enter string for ${fields[i]}: " value
-            
-            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
-               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
-              if [ $? -eq 1 ]; then
-                echo "Primary key must be unique and this value already exit , please enter another value"
-                break 2
-              fi
-            fi
-
-            if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
-                break 
-            else
-                echo "Invalid input. You must enter a string."
-            fi
-
-        done
-    fi
-
-
-        
-    my_array+=("$value")
+        my_array+=("$value")
     done
     
     # Insert the data into the table
-    echo ${my_array[*]} >> "$local_TableName"
+    echo "${my_array[*]}" >> "$local_TableName"
     echo "-------------------" >> "$local_TableName"
 
     echo "Data inserted successfully into $local_TableName."
 }
-
 
 
 function updateTable () {
