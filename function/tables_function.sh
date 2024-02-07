@@ -27,6 +27,15 @@ function setTableAttributes() {
       validateName "$columnName" "Feild"
       local returnValidateName=$?
       if [ $returnValidateName -eq 1 ]; then
+         searchElementInColumn "1" "$columnName" "$tableMetaData"
+         local returnSearchElementInColumn=$?
+
+         if [ $returnSearchElementInColumn -eq 1 ]; then
+          echo "the column name is already found in your table...."
+          continue
+         fi
+
+
           fields[0]=$columnName
           fname=1  
         else
@@ -96,7 +105,7 @@ function createTable () {
         read local_tableName
     fi
 
-    validateName "$local_dbName" "Tablee"
+    validateName "$local_dbName" "Table"
 
     if [ $? -eq 1 ]; then
     touch "$PWD/$local_tableName"
@@ -108,7 +117,7 @@ function createTable () {
 function listTables() {
   if [ -n "$(ls $PWD/*)" ]; then
       echo "Available Tables:"
-      ls $PWD |grep -v 'meta$'
+      ls $PWD | grep -v 'meta$'
   else
       echo "There Are No Databases"
   fi
@@ -481,9 +490,6 @@ function selectFromTable()
     fi
    
 }
-
-#EEEEEEEEEEEEEEEEEnd Of The Projecttttttttttttttttt
-
 
 
 

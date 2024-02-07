@@ -11,6 +11,9 @@ function validateName(){
         *[!a-z0-9A-Z]*)
             echo "$localType Name Cannot Have Special Characters."
             ;;
+        [a-zA-z])
+            echo "$localType Name Must Have More Than One Character."
+            ;;  
         *)
             return 1;  
             ;;
