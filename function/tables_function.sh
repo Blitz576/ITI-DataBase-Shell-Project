@@ -116,6 +116,7 @@ function dropTable() {
         return ;
     fi
     rm $local_TableName
+    rm ${local_TableName}.meta
     echo "$local_TableName deleted successfully"
     
 }
@@ -167,7 +168,7 @@ function insertIntoTable() {
             done
         elif [[ ${fields_type[i]} == "STRING" ]]; then
             while true; do
-                read -p "Enter string for ${fields[i]}: " value
+                read -p "Enter string for ${fields[i]} ($uniqness) : " value
                 if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
                 if [[ ${fields_primary[i]} == "PRIMARY" ]]; then 
                     searchElementInColumn $((i + 1)) "$value" "$local_TableName"
@@ -193,7 +194,6 @@ function insertIntoTable() {
     
     # Insert the data into the table
     echo "${my_array[*]}" >> "$local_TableName"
-    echo "-------------------" >> "$local_TableName"
 
     echo "Data inserted successfully into $local_TableName."
 }

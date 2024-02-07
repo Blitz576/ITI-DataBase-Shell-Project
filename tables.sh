@@ -16,14 +16,14 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
         2)
             if [ -n "$(ls $PWD/*)" ]; then
                 echo "Available Tables:"
-                ls $PWD
+                ls $PWD |grep -v 'meta$'
             else
                 echo "There Are No Databases"
             fi
             ;;
         3)
             read -p "Enter the table name: " _tableName
-            dropDataTable "$_tableName"    
+            dropTable "$_tableName"    
             ;;    
         4)
             read -p "Enter the table name: " _tableName
@@ -50,8 +50,5 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
             ;;
     esac
 done
-echo $PWD
-cd ..
-cd ..
-echo $PWD
+
 PS3="Main System > "
