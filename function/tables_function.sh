@@ -105,7 +105,14 @@ function createTable () {
     fi
 }
 
-
+function listTables() {
+  if [ -n "$(ls $PWD/*)" ]; then
+      echo "Available Tables:"
+      ls $PWD |grep -v 'meta$'
+  else
+      echo "There Are No Databases"
+  fi
+}
 
 function dropTable() {
     

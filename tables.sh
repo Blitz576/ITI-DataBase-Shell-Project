@@ -14,12 +14,7 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
             createTable "$tableName" "Table"
             ;;
         2)
-            if [ -n "$(ls $PWD/*)" ]; then
-                echo "Available Tables:"
-                ls $PWD |grep -v 'meta$'
-            else
-                echo "There Are No Databases"
-            fi
+            listTables
             ;;
         3)
             read -p "Enter the table name: " _tableName

@@ -58,12 +58,22 @@ function dropDataBase() {
     echo "$local_dbName deleted successfully"
     
 }
-function listDataBases(){
-   local dataBaseCount=`ls  DataBases/ 2>/dev/null | wc -l`
-    if [ $dataBaseCount -gt 0 ]; then
-                echo "Available Databases:"
-                ls  DataBases/ | sed 's/DataBases\///'
-            else
-                echo "There Are No Databases"
-            fi
+function listDataBases() {
+    local dataBaseDir="DataBases/"
+
+    if [ -d "$dataBaseDir" ]; then
+        local databases=("$dataBaseDir"/*)
+
+        if [ ${#databases[@]} -gt 0 ]; then
+            echo "Available Databases:"
+            for db in "${databases[@]}"; do
+                echo "$(basename "$db")"
+            done
+        else
+            echo "There Are No Databases"
+        fi
+    else
+        echo "Database directory not found."
+    fi
 }
+
