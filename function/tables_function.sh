@@ -100,14 +100,18 @@ function setTableAttributes() {
 
 function createTable () {
     local local_tableName="$1"
+    validateName "$local_tableName" "Table"
+    local isValid=$?
+    
+
+    if [ $isValid -eq 1 ];then
+
     if [ -f "$local_tableName" ]; then
         echo "$local_tableName Already Exists. Please Enter Another Name: "
         read local_tableName
     fi
 
-    validateName "$local_dbName" "Table"
 
-    if [ $? -eq 1 ]; then
     touch "$PWD/$local_tableName"
     touch "$PWD/${local_tableName}.meta"
     setTableAttributes "${local_tableName}.meta"
