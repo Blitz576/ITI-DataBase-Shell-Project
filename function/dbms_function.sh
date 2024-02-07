@@ -28,13 +28,14 @@ function createDataBase () {
 
 function connectToDataBase () {
     local dbName="$1"
-    
+    echo $PWD
     if [ -d "DataBases" ] 
     then
           cd "DataBases"
         if [[ -d $dbName ]]; then
             cd "$dbName"
             ../.././tables.sh "$dbName"
+            cd ../..
         else
           echo "DataBase is not exist"
           cd ..    

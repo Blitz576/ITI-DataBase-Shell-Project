@@ -141,49 +141,42 @@ function insertIntoTable(){
 
    for ((i=0; i<$length; i++)); do
     local uniqness=${fields_primary[i]}
+    while true; do
+    read -p "Enter value for ${fields[i]} value : " fieldValue
 
-    if [[ ${fields_type[i]} == "INT" ]]; then
-        while true; do
-            read -p "Enter int number for ${fields[i]} ($uniqness): " value
+    #check primary
+    if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
+               searchElementInColumn $i $value $local_TableName
+               result=$?
+              if [ $result -eq 1 ]; then
+                echo "Primary data always be unique please try to enter a unique data."
+                continue;
+              else
+                #data integrity
+                if [[ ${fields_type[i]} == "INT" ]]; then
+                    if [[ "$value" =~ ^[0-9]+$ ]]; then
+                    break  # Exit the loop if the value is an integer
+                  else
+                    echo "Invalid input. You must enter an integer."
+                  fi
+                else
+                   if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
+                      break  # Exit the loop if the value is a string
+                  else
+                      echo "Invalid input. You must enter a string."
+                  fi
+               fi    
+      fi
+   fi
 
-            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
-               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
-              if [ $? -eq 1 ]; then
-                echo "Primary key must be unique and this value already exit , please enter another value"
-                break 2
-              fi
-            fi
-            if [[ "$value" =~ ^[0-9]+$ ]]; then
-                break  
-            else
-                echo "Invalid input. You must enter an integer."
-            fi
 
-        done
-    elif [[ ${fields_type[i]} == "STRING" ]]; then
-        while true; do
-            read -p "Enter string for ${fields[i]}: " value
-            
-            if [[ ${fields_primary[i]} == "PRIMARY" ]] ; then 
-               searchElementInColumn $((i + 1)) "$value" "$local_TableName"
-              if [ $? -eq 1 ]; then
-                echo "Primary key must be unique and this value already exit , please enter another value"
-                break 2
-              fi
-            fi
 
-            if [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
-                break 
-            else
-                echo "Invalid input. You must enter a string."
-            fi
-
-        done
-    fi
-
+    done
 
         
     my_array+=("$value")
+ 
+
     done
     
     # Insert the data into the table
@@ -301,8 +294,8 @@ function updateTable () {
                 }
              } ' "$targetTableName")  
               
-             echo $pkRow 
              ((feildIndex--))
+             touch ${targetTableName}.meta_temp
              awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
                 for (i=1; i<=NF; i++) { 
                     
@@ -310,9 +303,11 @@ function updateTable () {
                         $i=newData
                     }
                 }
-            print } ' "$targetTableName" 
+            print } ' "$targetTableName" > ${targetTableName}.meta_temp
+            cat ${targetTableName}.meta_temp > "$targetTableName"
+            rm  ${targetTableName}.meta_temp
            echo "sucessfully updated"
-
+     
 
           else
             echo "Data Mis Match With The Primary Key Please Try Again"
@@ -348,12 +343,56 @@ function deleteFromTable () {
             echo "Deleted successfully"
         elif [ $choice -eq 1 ]; then
             # Delete by id
-            local pk=0
-            read -p "Enter the primary key for the row you want to delete from: " pk
-            
+            read -p "Enter the primary key for the row you want to delete from: " pkData
+            local pkColumn= getPrimaryFeildIndex "$targetTableName"
+            dataIntegrity `awk -v pattern="PRIMARY" '$2 == pattern {print $3; exit}' "${targetTableName}.meta"`
+            local primaryKeyDataType=$?
+            local specificValidData=0
+               #validate Data
+               
+               if [ $primaryKeyDataType -eq 1 ]; then
+     
+              if [[ $pkData =~ ^[0-9]+$ ]]
+              then
+                  specificValidData=1
+              else
+                  specificValidData=0
+              fi
+              
+            elif [ $primaryKeyDataType -eq 2 ]; then
+              specificValidData=1
+            else
+              specificValidData=0
+            fi
+            echo "$specificValidData" 
+            if [ $specificValidData -eq 1 ];then
+
+                  #get the primary key index
+                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$pkData" '{
+                    for (i=1; i<=NF; i++) { 
+                        
+                        if ($i == specificData) {
+                            print NR
+                            exit
+                        }
+                    }
+                } ' "$targetTableName")
+                  
+                #Delete By Id
+                touch "${targetTableName}.meta_temp"
+                awk -v pkRow="$pkRow" '{
+                  if(NR != pkRow)
+                   print
+                }' "$targetTableName" > ${targetTableName}.meta_temp
+               cat ${targetTableName}.meta_temp > ${targetTableName}
+               rm ${targetTableName}.meta_temp
+                echo "Suceccfully Deleted"  
+             else 
+               echo "you Entered Wrong Data Can't delete"
+
+            fi    
             # Use sed to delete the row where the primary key exists
-            sed -i "/$pk/d" "$targetTableName"
-            echo "Deleted row with primary key $pk"
+            
         else
             echo "Wrong choice. Please enter a correct number."
         fi
@@ -402,3 +441,9 @@ function selectFromTable()
     fi
    
 }
+
+#EEEEEEEEEEEEEEEEEnd Of The Projecttttttttttttttttt
+
+
+
+
