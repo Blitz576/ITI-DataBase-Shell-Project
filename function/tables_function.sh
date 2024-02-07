@@ -225,11 +225,10 @@ function updateTable () {
    then
     feilds[$item]=$targetFeildName
     local feildData=0
-    read -p "insert the new data: " feildData 
+    read -p "insert the new data : " feildData 
     #check data primary
     getPrimaryFeildIndex "$targetTableName"
     local pkColumn=$? 
-    echo $pkColumn
     #check data integrity
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
     local returnDataIntegrity=$?
@@ -242,10 +241,8 @@ function updateTable () {
      
      if [[ $feildData =~ ^[0-9]+$ ]]
      then
-        echo "yes"
         validData=1
      else
-       echo "no"
         validData=0
     fi    
    fi
@@ -258,23 +255,35 @@ function updateTable () {
      fi
    fi
    
-  local feildIndex=$(awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta")
-   
+  getFeildIndex "$targetTableName" "$targetFeildName"
+  local feildIndex=$?  
+  local isPrimary=0
+  if [ "$feildIndex" -eq "$pkColumn" ]; then
+    isPrimary=1
+  fi
+  echo "$isPrimary" 
+
+
+
+
+
    if [ $validData -eq 1 ]
    then
       #check if the data Exist or not 
-        read -p "enter id or pirmary key data( if you do not want that option press '.' ): " specificData
+        read -p "enter pirmary key data( if you do not want that option press '.' ): " specificData
         
         if [ $specificData = "." ]; then
+
+           if [ $isPrimary -eq 1 ]; then
+             echo "sorry but the column is primary it must be unique"
+             return
+           fi 
+
            # Replace oldData with feildData within the feild feildIndex
-          ((feildIndex--))
           
           touch ${targetTableName}.meta_temp
           awk -v feildIndex="$feildIndex" -v newData="$feildData" '{
-              for (i=1; i<=NF; i++) { 
-                  if (i == feildIndex )
-                      $i=newData
-              }
+              $feildIndex=newData
               print
           }' "$targetTableName" > ${targetTableName}.meta_temp
           cat ${targetTableName}.meta_temp > ${targetTableName}
@@ -292,27 +301,40 @@ function updateTable () {
               if [[ $specificData =~ ^[0-9]+$ ]]
               then
                   specificValidData=1
-              else
-                  specificValidData=0
               fi
               
             elif [ $primaryKeyDataType -eq 2 ]; then
+              
               specificValidData=1
             else
               specificValidData=0
             fi
+
             if [ $specificValidData -eq 1 ];then
+
+                if [[ $isPrimary -eq 1 ]]; then
+                  searchElementInColumn "$pkColumn" "$specificData" "$targetTableName"
+                  local returnsearchElementInColumn=$?
+                  if [[ $returnsearchElementInColumn -eq 1 ]]; then
+                    echo "Can't Insert repeated Data In a Primary Column..."
+                    return 
+                  fi
+                fi
+
+
               local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
-                for (i=1; i<=NF; i++) { 
-                    
-                    if ($i == specificData) {
-                        print NR
-                        exit
-                    }
-                }
-             } ' "$targetTableName")  
-              
-             ((feildIndex--))
+              if ($feildIndex == specificData) {
+                  print NR
+                  exit
+              }
+          } END {
+              print 0
+          }' "$targetTableName")  
+                   
+             if [[ $pkRow -eq 0 ]]; then
+              echo "Data you inserted is not found in the primary column...."
+              return
+             fi
              touch ${targetTableName}.meta_temp
              awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
                 for (i=1; i<=NF; i++) { 
