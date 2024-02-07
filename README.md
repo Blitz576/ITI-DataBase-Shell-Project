@@ -27,7 +27,7 @@ Once connected to a specific database, users are presented with a new menu offer
 
 ## Implementation Hints
 
-- Databases are stored as directories within the same directory as the script file.
+- Databases are stored as directories within the same directory as the script file under the directory of `/DataBases`.
 - Row selection output is formatted for easy readability in the terminal.
 - The script prompts users for column datatypes during table creation and ensures data integrity during insertion and updating.
 - Users are prompted for primary key information during table creation, and the script enforces primary key constraints during record insertion.
