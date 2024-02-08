@@ -110,7 +110,7 @@ function listTables() {
       echo "Available Tables:"
       ls $PWD |grep -v 'meta$'
   else
-      echo "There Are No Databases"
+        echo "There Are No Databases"
   fi
 }
 
@@ -225,10 +225,11 @@ function updateTable () {
    then
     feilds[$item]=$targetFeildName
     local feildData=0
-    read -p "insert the new data : " feildData 
+    read -p "insert the new data: " feildData 
     #check data primary
     getPrimaryFeildIndex "$targetTableName"
     local pkColumn=$? 
+    echo $pkColumn
     #check data integrity
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
     local returnDataIntegrity=$?
@@ -241,8 +242,10 @@ function updateTable () {
      
      if [[ $feildData =~ ^[0-9]+$ ]]
      then
+        echo "yes"
         validData=1
      else
+       echo "no"
         validData=0
     fi    
    fi
@@ -255,35 +258,23 @@ function updateTable () {
      fi
    fi
    
-  getFeildIndex "$targetTableName" "$targetFeildName"
-  local feildIndex=$?  
-  local isPrimary=0
-  if [ "$feildIndex" -eq "$pkColumn" ]; then
-    isPrimary=1
-  fi
-  echo "$isPrimary" 
-
-
-
-
-
+  local feildIndex=$(awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta")
+   
    if [ $validData -eq 1 ]
    then
       #check if the data Exist or not 
-        read -p "enter pirmary key data( if you do not want that option press '.' ): " specificData
+        read -p "enter id or pirmary key data( if you do not want that option press '.' ): " specificData
         
         if [ $specificData = "." ]; then
-
-           if [ $isPrimary -eq 1 ]; then
-             echo "sorry but the column is primary it must be unique"
-             return
-           fi 
-
            # Replace oldData with feildData within the feild feildIndex
+          ((feildIndex--))
           
           touch ${targetTableName}.meta_temp
           awk -v feildIndex="$feildIndex" -v newData="$feildData" '{
-              $feildIndex=newData
+              for (i=1; i<=NF; i++) { 
+                  if (i == feildIndex )
+                      $i=newData
+              }
               print
           }' "$targetTableName" > ${targetTableName}.meta_temp
           cat ${targetTableName}.meta_temp > ${targetTableName}
@@ -301,40 +292,27 @@ function updateTable () {
               if [[ $specificData =~ ^[0-9]+$ ]]
               then
                   specificValidData=1
+              else
+                  specificValidData=0
               fi
               
             elif [ $primaryKeyDataType -eq 2 ]; then
-              
               specificValidData=1
             else
               specificValidData=0
             fi
-
             if [ $specificValidData -eq 1 ];then
-
-                if [[ $isPrimary -eq 1 ]]; then
-                  searchElementInColumn "$pkColumn" "$specificData" "$targetTableName"
-                  local returnsearchElementInColumn=$?
-                  if [[ $returnsearchElementInColumn -eq 1 ]]; then
-                    echo "Can't Insert repeated Data In a Primary Column..."
-                    return 
-                  fi
-                fi
-
-
               local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
-              if ($feildIndex == specificData) {
-                  print NR
-                  exit
-              }
-          } END {
-              print 0
-          }' "$targetTableName")  
-                   
-             if [[ $pkRow -eq 0 ]]; then
-              echo "Data you inserted is not found in the primary column...."
-              return
-             fi
+                for (i=1; i<=NF; i++) { 
+                    
+                    if ($i == specificData) {
+                        print NR
+                        exit
+                    }
+                }
+             } ' "$targetTableName")  
+              
+             ((feildIndex--))
              touch ${targetTableName}.meta_temp
              awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
                 for (i=1; i<=NF; i++) { 
@@ -404,20 +382,32 @@ function deleteFromTable () {
             else
               specificValidData=0
             fi
-            echo "$specificValidData" 
+             
             if [ $specificValidData -eq 1 ];then
 
                   #get the primary key index
-                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$pkData" '{
-                    for (i=1; i<=NF; i++) { 
-                        
-                        if ($i == specificData) {
-                            print NR
-                            exit
-                        }
-                    }
-                } ' "$targetTableName")
-                  
+                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$pkData" '
+                  {
+                      for (i=1; i<=NF; i++) { 
+                          if ($i == specificData) {
+                              found=NR
+                          }
+                      }
+                  }
+                  END {
+                      if (found == 0)
+                          print 0
+                      else
+                         print found
+                  }
+              ' "$targetTableName" ) 
+
+
+                if [ $pkRow -eq 0 ] 
+                then
+                  echo "data you entered is not found in the primary key"
+                  return
+                fi  
                 #Delete By Id
                 touch "${targetTableName}.meta_temp"
                 awk -v pkRow="$pkRow" '{
@@ -456,24 +446,45 @@ function selectFromTable()
 
     local metaFile="${local_TableName}.meta"
     local columns=($(grep -E 'INT|STRING' $metaFile |awk '{print $1}'))
-
+    getPrimaryFeildIndex "$local_TableName"
+    local primaryKey=$?
 
     echo "Available Columns: ${columns[*]}"
 
     while true; do
-    read -p "Enter column name to select (or enter * to select all): " selectedColumn
+    read -p "Enter column name to select or enter (*) to select all or enter (.) to select row : " selectedColumn
    
-    if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " ]]; then
-        echo "Invalid column name. Please select a valid column."
-    else
-       break
-    fi
+    if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " && $selectedColumn != "." ]]; then
+    echo "Invalid column name. Please select a valid column."
+else
+    break
+fi
     done
 
     echo "Selected Data from $local_TableName:"
 
     if [ "$selectedColumn" == "*" ]; then
         cat "$local_TableName"
+    elif [ "$selectedColumn" == "." ];
+    then
+     read -p "enter ${columns} value to select from: " primaryKeyValue
+     local isFound=0
+   awk -v primaryKey="$primaryKeyValue" -v primaryKeyColumn="$primaryKey" '
+    {
+        if ($primaryKeyColumn == primaryKey){
+            print  
+            isFound=1
+            exit
+        }
+    }
+    END {
+        if (isFound == 0)
+            print "Data is not found in 1 please enter a valid data ...."
+    }
+' "$local_TableName"
+
+     
+
     else
       getFeildIndex "$local_TableName" "$selectedColumn"
       awk -v col="$?" '{print $col}' $local_TableName

@@ -29,12 +29,13 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
             deleteFromTable "$_tableName"
             ;;
         6)
-            read -p "Enter the Table name: " _tableName
-            selectFromTable "$_tableName" 
-            ;;
-        7)
             read -p "Enter the Table Name: " _tableName
             updateTable "$_tableName"
+            ;;
+            
+        7)
+            read -p "Enter the Table name: " _tableName
+            selectFromTable "$_tableName" 
             ;;
         8)
            echo "Welcome To your DataBase Again"

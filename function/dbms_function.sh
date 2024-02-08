@@ -27,33 +27,37 @@ function createDataBase () {
 }
 
 function connectToDataBase () {
-    local dbName="$1"
+    read -p "Enter the database name: " dbName
     echo $PWD
     if [ -d "DataBases" ] 
     then
           cd "DataBases"
+        while true; do
         if [[ -d $dbName ]]; then
             cd "$dbName"
             ../.././tables.sh "$dbName"
             cd ../..
+            break
         else
           echo "DataBase is not exist"
-          cd ..    
+          read -p "Enter the database name: " dbName
         fi
+        done
     else
         echo "Missing DataBases directory please create a DataBase"
     fi
     
 }
-
 function dropDataBase() {
-    
-    if [ ! -d "DataBases/$local_dbName" ]
-    then
-        echo "Database Not Found."
-        return ;
-    fi
     local local_dbName="$1"
+    while true; do
+    if [ ! -d "DataBases/$local_dbName" ]; then
+        echo "Database Not Found."
+        read -p "Enter the database name: " _dbName
+    else
+         break
+    fi
+    done
     rm -r DataBases/$local_dbName
     echo "$local_dbName deleted successfully"
     

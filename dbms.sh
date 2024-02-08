@@ -36,7 +36,6 @@ select menu in "Create a Database" "List Databases" "Connect To Database" "Drop 
             listDataBases
             ;;
         3)
-            read -p "Enter the database name: " _dbName
             connectToDataBase "$_dbName"
             ;;
         4)
