@@ -238,16 +238,36 @@ function updateTable () {
    then
     feilds[$item]=$targetFeildName
     local feildData=0
-    read -p "insert the new data : " feildData 
     #check data primary
     getPrimaryFeildIndex "$targetTableName"
     local pkColumn=$? 
     #check data integrity
+    
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
     local returnDataIntegrity=$?
     local validData=0
-   
+    
+    getFeildIndex "$targetTableName" "$targetFeildName"
+    local feildIndex=$? 
+    
+    local promptDataType="String"
+    local promptPrimaryKey="Not Primary"
+    
 
+    local isPrimary=0
+    if [ "$feildIndex" -eq "$pkColumn" ]; then
+    isPrimary=1
+    fi
+
+    if [[ $returnDataIntegrity -eq 1 ]]; then
+      promptDataType="Int"
+    fi
+
+    if [[ $isPrimary -eq 1 ]]; then
+      promptPrimaryKey="Primary"
+    fi
+
+    read -p "insert the new data (${promptDataType}) (${promptPrimaryKey}) : " feildData 
 
    
    if [ $returnDataIntegrity -eq 1 ]; then
@@ -267,15 +287,7 @@ function updateTable () {
      validData=1
      fi
    fi
-   
-  getFeildIndex "$targetTableName" "$targetFeildName"
-  local feildIndex=$?  
-  local isPrimary=0
-  if [ "$feildIndex" -eq "$pkColumn" ]; then
-    isPrimary=1
-  fi
-  echo "$isPrimary" 
-
+     
 
 
 

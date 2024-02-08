@@ -28,11 +28,11 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
             read -p "Enter the table name: " _tableName
             deleteFromTable "$_tableName"
             ;;
-        7)
+        6)
             read -p "Enter the Table Name: " _tableName
             updateTable "$_tableName"
             ;;    
-        6)
+        7)
             read -p "Enter the Table name: " _tableName
             selectFromTable "$_tableName" 
             ;;
