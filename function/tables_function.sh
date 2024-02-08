@@ -27,6 +27,15 @@ function setTableAttributes() {
       validateName "$columnName" "Feild"
       local returnValidateName=$?
       if [ $returnValidateName -eq 1 ]; then
+         searchElementInColumn "1" "$columnName" "$tableMetaData"
+         local returnSearchElementInColumn=$?
+
+         if [ $returnSearchElementInColumn -eq 1 ]; then
+          echo "the column name is already found in your table...."
+          continue
+         fi
+
+
           fields[0]=$columnName
           fname=1  
         else
@@ -91,14 +100,18 @@ function setTableAttributes() {
 
 function createTable () {
     local local_tableName="$1"
+    validateName "$local_tableName" "Table"
+    local isValid=$?
+    
+
+    if [ $isValid -eq 1 ];then
+
     if [ -f "$local_tableName" ]; then
         echo "$local_tableName Already Exists. Please Enter Another Name: "
         read local_tableName
     fi
 
-    validateName "$local_dbName" "Tablee"
 
-    if [ $? -eq 1 ]; then
     touch "$PWD/$local_tableName"
     touch "$PWD/${local_tableName}.meta"
     setTableAttributes "${local_tableName}.meta"
@@ -108,7 +121,7 @@ function createTable () {
 function listTables() {
   if [ -n "$(ls $PWD/*)" ]; then
       echo "Available Tables:"
-      ls $PWD |grep -v 'meta$'
+      ls $PWD | grep -v 'meta$'
   else
         echo "There Are No Databases"
   fi
@@ -231,11 +244,32 @@ function updateTable () {
     local pkColumn=$? 
     echo $pkColumn
     #check data integrity
+    
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
     local returnDataIntegrity=$?
     local validData=0
-   
+    
+    getFeildIndex "$targetTableName" "$targetFeildName"
+    local feildIndex=$? 
+    
+    local promptDataType="String"
+    local promptPrimaryKey="Not Primary"
+    
 
+    local isPrimary=0
+    if [ "$feildIndex" -eq "$pkColumn" ]; then
+    isPrimary=1
+    fi
+
+    if [[ $returnDataIntegrity -eq 1 ]]; then
+      promptDataType="Int"
+    fi
+
+    if [[ $isPrimary -eq 1 ]]; then
+      promptPrimaryKey="Primary"
+    fi
+
+    read -p "insert the new data (${promptDataType}) (${promptPrimaryKey}) : " feildData 
 
    
    if [ $returnDataIntegrity -eq 1 ]; then
@@ -492,9 +526,6 @@ fi
     fi
    
 }
-
-#EEEEEEEEEEEEEEEEEnd Of The Projecttttttttttttttttt
-
 
 
 

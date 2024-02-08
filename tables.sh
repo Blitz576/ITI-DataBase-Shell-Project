@@ -31,6 +31,10 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
         6)
             read -p "Enter the Table Name: " _tableName
             updateTable "$_tableName"
+            ;;    
+        7)
+            read -p "Enter the Table name: " _tableName
+            selectFromTable "$_tableName" 
             ;;
             
         7)
@@ -42,7 +46,7 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
            break;
         ;;    
         *)
-            echo "Invalid option. Please choose a number between 1 and 5."
+            echo "Invalid option. Please choose a number between 1 and 8."
             ;;
     esac
 done

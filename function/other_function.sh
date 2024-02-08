@@ -1,6 +1,13 @@
 function validateName(){
    local localName=$1
-   local localType="$2" 
+   local localType="$2"
+
+   if [ ${#localName} -eq 0 ];then
+    
+    echo "$localType Should Not be Empty"
+    return
+
+   fi 
     case $localName in
         [!a-zA-Z]*)
             echo "$localType Name Cannot Start With Special Characters Or Numbers."
@@ -11,6 +18,9 @@ function validateName(){
         *[!a-z0-9A-Z]*)
             echo "$localType Name Cannot Have Special Characters."
             ;;
+        [a-zA-z])
+            echo "$localType Name Must Have More Than One Character."
+            ;;  
         *)
             return 1;  
             ;;

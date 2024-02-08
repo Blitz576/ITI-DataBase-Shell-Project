@@ -14,16 +14,18 @@ function createDataBasesDirectory () {
 
 function createDataBase () {
     local local_dbName="$1"
-    while [ -d "DataBases/$local_dbName" ]; do
-        echo "$local_dbName Already Exists. Please Enter Another Name: "
-        read local_dbName
-    done
-
     validateName "$local_dbName" "DataBase"
+    local isValid=$?
+    if [ $isValid -eq 1 ]; then
+      while [ -d "DataBases/$local_dbName" ]; do
+        read -p "$local_dbName Already Exists. Please Enter Another Name: " local_dbName
+    done
+    validateName "$local_dbName" "DataBase" 
     if [ $? -eq 1 ]; then
        mkdir -p "DataBases/$local_dbName"
        echo "$local_dbName Created Successfully."         
-    fi
+    fi  
+   fi
 }
 
 function connectToDataBase () {
