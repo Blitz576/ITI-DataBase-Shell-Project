@@ -130,11 +130,15 @@ function listTables() {
 function dropTable() {
     
     local local_TableName="$1"
+    while true; do
     if [ ! -f "$local_TableName" ]
     then
         echo "Table Not Found."
-        return ;
+        read -p "Enter the table name: " local_TableName
+    else 
+        break
     fi
+    done
     rm $local_TableName
     rm ${local_TableName}.meta
     echo "$local_TableName deleted successfully"
@@ -145,10 +149,15 @@ function dropTable() {
 function insertIntoTable() {
     local local_TableName="$1"
 
-    if [ ! -f "$local_TableName" ]; then
+    while true; do
+    if [ ! -f "$local_TableName" ]
+    then
         echo "Table Not Found."
-        return
+        read -p "Enter the table name: " local_TableName
+    else 
+        break
     fi
+    done
 
     local metaFile="${local_TableName}.meta"
 
@@ -495,9 +504,10 @@ else
 fi
     done
 
-    echo "Selected Data from $local_TableName:"
 
     if [ "$selectedColumn" == "*" ]; then
+        echo "Selected Data from $local_TableName:"
+        echo "${columns[*]}"
         cat "$local_TableName"
     elif [ "$selectedColumn" == "." ];
     then
@@ -513,13 +523,13 @@ fi
     }
     END {
         if (isFound == 0)
-            print "Data is not found in 1 please enter a valid data ...."
+            print "Data is not found table"
     }
 ' "$local_TableName"
 
-     
-
     else
+      echo "Selected $selectedColumn from $local_TableName:"
+      echo "$selectedColumn"
       getFeildIndex "$local_TableName" "$selectedColumn"
       awk -v col="$?" '{print $col}' $local_TableName
     
