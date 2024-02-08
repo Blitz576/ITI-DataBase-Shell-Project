@@ -237,6 +237,10 @@ function updateTable () {
         echo "Table Not Found."
         return
     fi
+    if [ ! -s "$targetTableName" ]; then
+        echo "The table is empty."
+        return
+    fi
     
    
    read -p "Enter the feild name: " targetFeildName
@@ -247,11 +251,11 @@ function updateTable () {
    then
     feilds[$item]=$targetFeildName
     local feildData=0
-    read -p "insert the new data: " feildData 
+    # read -p "insert the new data: " feildData 
     #check data primary
     getPrimaryFeildIndex "$targetTableName"
     local pkColumn=$? 
-    echo $pkColumn
+    # echo $pkColumn
     #check data integrity
     
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
@@ -285,7 +289,7 @@ function updateTable () {
      
      if [[ $feildData =~ ^[0-9]+$ ]]
      then
-        echo "yes"
+        # echo "yes"
         validData=1
      else
        echo "no"
@@ -392,6 +396,10 @@ function updateTable () {
 
 function deleteFromTable () {
     local targetTableName=$1  
+    if [ ! -s "$targetTableName" ]; then
+        echo "The Table is empty."
+        return
+    fi
 
     # Check if the table exists or not 
     if [ -f "$targetTableName" ]; then
@@ -487,6 +495,11 @@ function selectFromTable()
         return
     fi
 
+    if [ ! -s "$local_TableName" ]; then
+        echo "The Table is empty."
+        return
+    fi
+
     local metaFile="${local_TableName}.meta"
     local columns=($(grep -E 'INT|STRING' $metaFile |awk '{print $1}'))
     getPrimaryFeildIndex "$local_TableName"
@@ -499,9 +512,9 @@ function selectFromTable()
    
     if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " && $selectedColumn != "." ]]; then
     echo "Invalid column name. Please select a valid column."
-else
-    break
-fi
+    else
+      break
+    fi
     done
 
 
