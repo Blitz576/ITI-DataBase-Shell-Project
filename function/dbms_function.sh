@@ -30,7 +30,6 @@ function createDataBase () {
 
 function connectToDataBase () {
     read -p "Enter the database name: " dbName
-    echo $PWD
     if [ -d "DataBases" ] 
     then
           cd "DataBases"
@@ -70,16 +69,15 @@ function listDataBases() {
     if [ -d "$dataBaseDir" ]; then
         local databases=("$dataBaseDir"/*)
 
-        if [ ${#databases[@]} -gt 0 ]; then
-            echo "Available Databases:"
-            for db in "${databases[@]}"; do
+        echo "Available Databases:"
+        for db in "${databases[@]}"; do
+            if [ "$(basename "$db")" == "*" ]; then
+                echo "Database is empty"
+            else
                 echo "$(basename "$db")"
-            done
-        else
-            echo "There Are No Databases"
-        fi
+            fi
+        done
     else
         echo "Database directory not found."
     fi
 }
-

@@ -19,11 +19,14 @@ function setTableAttributes() {
   local priamryChecker=0
   read -p "Enter the number of feilds: " feildCount
  
-  
+  while [ $feildCount -lt 1 ]; do
+    echo "wrong number, enter a valid number again..."
+    read -p "Enter the number of fields: " feildCount
+done
   while [ $iterator -lt $feildCount ]; do
    #check if the field name was entered or not
     if [ $fname -eq 0 ]; then
-      read -p "column name : " columnName
+      read -p "column name : "   columnName
       validateName "$columnName" "Feild"
       local returnValidateName=$?
       if [ $returnValidateName -eq 1 ]; then
@@ -119,11 +122,11 @@ function createTable () {
 }
 
 function listTables() {
-  if [ -n "$(ls $PWD/*)" ]; then
+  if [ -n "$(ls $PWD)" ]; then
       echo "Available Tables:"
       ls $PWD | grep -v 'meta$'
   else
-        echo "There Are No Databases"
+        echo "There Are No Tables"
   fi
 }
 
@@ -192,7 +195,7 @@ function insertIntoTable() {
                 fi
                     
               else
-                    echo "Invalid input. You must enter an integer."
+                    echo "Invalid input. You must enter positive number ."
               fi
             done
         elif [[ ${fields_type[i]} == "STRING" ]]; then
@@ -247,11 +250,9 @@ function updateTable () {
    then
     feilds[$item]=$targetFeildName
     local feildData=0
-    read -p "insert the new data: " feildData 
     #check data primary
     getPrimaryFeildIndex "$targetTableName"
     local pkColumn=$? 
-    echo $pkColumn
     #check data integrity
     
     dataIntegrity $(awk -v pattern="$targetFeildName" '$1 == pattern {print $3}' "${targetTableName}.meta")
@@ -495,7 +496,7 @@ function selectFromTable()
     echo "Available Columns: ${columns[*]}"
 
     while true; do
-    read -p "Enter column name to select or enter (*) to select all or enter (.) to select row : " selectedColumn
+    read -p "Enter (column) name to select or enter (*) to select all or enter (.) to select row : " selectedColumn
    
     if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " && $selectedColumn != "." ]]; then
     echo "Invalid column name. Please select a valid column."

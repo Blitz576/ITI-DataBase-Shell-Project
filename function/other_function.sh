@@ -9,13 +9,13 @@ function validateName(){
 
    fi 
     case $localName in
-        [!a-zA-Z]*)
+        [!a-zA-Z_]*)
             echo "$localType Name Cannot Start With Special Characters Or Numbers."
             ;;
         *" "*)
             echo "$localType Name Should Not Have Any Spaces."
             ;;
-        *[!a-z0-9A-Z]*)
+        *[!a-z0-9A-Z_]*)
             echo "$localType Name Cannot Have Special Characters."
             ;;
         [a-zA-z])
