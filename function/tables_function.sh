@@ -17,11 +17,11 @@ function setTableAttributes() {
   local fpconstraint=0
   local fdatatype=0
   local priamryChecker=0
-  read -p "Enter the number of feilds: " feildCount
+  read -p "Enter the number of feilds 😃 : " feildCount
  
   while [ $feildCount -lt 1 ]; do
-    echo "wrong number, enter a valid number again..."
-    read -p "Enter the number of fields: " feildCount
+    echo "wrong number ❌ , enter a valid number again..."
+    read -p "Enter the number of fields 😃 : " feildCount
 done
   while [ $iterator -lt $feildCount ]; do
    #check if the field name was entered or not
@@ -34,7 +34,7 @@ done
          local returnSearchElementInColumn=$?
 
          if [ $returnSearchElementInColumn -eq 1 ]; then
-          echo "the column name is already found in your table...."
+          echo "the column name is already found in your table 😓"
           continue
          fi
 
@@ -42,7 +42,7 @@ done
           fields[0]=$columnName
           fname=1  
         else
-          echo "there's wrong while typing please check and try again"
+          echo "there's wrong ❌ while typing please check and try again"
           continue
       fi
     fi
@@ -65,7 +65,7 @@ done
           fields[1]="NOT"
         else
           echo $feildConstraint
-          echo "there's wrong while typing please check and try again"
+          echo "there's wrong ❌ while typing please check and try again"
           continue
         fi
     fi
@@ -81,7 +81,7 @@ done
       elif [ $returnDataIntegrity -eq 2 ]; then
        fields[2]="STRING"
       else
-       echo "there's wrong while typing please check and try again"
+       echo "there's wrong ❌ while typing please check and try again"
        continue
      fi
   fi
@@ -110,7 +110,7 @@ function createTable () {
     if [ $isValid -eq 1 ];then
 
     if [ -f "$local_tableName" ]; then
-        echo "$local_tableName Already Exists. Please Enter Another Name: "
+        echo "$local_tableName Already Exists ❌ . Please Enter Another Name: "
         read local_tableName
     fi
 
@@ -126,7 +126,7 @@ function listTables() {
       echo "Available Tables:"
       ls $PWD | grep -v 'meta$'
   else
-        echo "There Are No Tables"
+        echo "There Are No Tables ❌ "
   fi
 }
 
@@ -136,7 +136,7 @@ function dropTable() {
     while true; do
     if [ ! -f "$local_TableName" ]
     then
-        echo "Table Not Found."
+        echo "Table Not Found. ❌ "
         read -p "Enter the table name: " local_TableName
     else 
         break
@@ -144,7 +144,7 @@ function dropTable() {
     done
     rm $local_TableName
     rm ${local_TableName}.meta
-    echo "$local_TableName deleted successfully"
+    echo "$local_TableName deleted successfully ❌"
     
 }
 
@@ -155,7 +155,7 @@ function insertIntoTable() {
     while true; do
     if [ ! -f "$local_TableName" ]
     then
-        echo "Table Not Found."
+        echo "Table Not Found. ❌"
         read -p "Enter the table name: " local_TableName
     else 
         break
@@ -183,7 +183,7 @@ function insertIntoTable() {
                     searchElementInColumn $((i + 1)) "$value" "$local_TableName"
                     
                     if [ $? -eq 1 ]; then
-                        echo "Primary key must be unique, and this value already exists. Please enter another value."
+                        echo "Primary key must be unique, and this value already exists 😞. Please enter another value."
 
                     else
                         inserted=1
@@ -195,7 +195,7 @@ function insertIntoTable() {
                 fi
                     
               else
-                    echo "Invalid input. You must enter positive number ."
+                    echo "Invalid input. ❌ You must enter positive number ."
               fi
             done
         elif [[ ${fields_type[i]} == "STRING" ]]; then
@@ -206,7 +206,7 @@ function insertIntoTable() {
                     searchElementInColumn $((i + 1)) "$value" "$local_TableName"
                     
                     if [ $? -eq 1 ]; then
-                        echo "Primary key must be unique, and this value already exists. Please enter another value."
+                        echo "Primary key must be unique, and this value already exists 😞. Please enter another value."
                     else
                         inserted=1
                         break
@@ -216,7 +216,7 @@ function insertIntoTable() {
                       break
                 fi
                 else
-                    echo "Invalid input. You must enter a string."
+                    echo "Invalid input. ❌ You must enter a string."
                 fi
             done
         fi
@@ -227,7 +227,7 @@ function insertIntoTable() {
     # Insert the data into the table
     echo "${my_array[*]}" >> "$local_TableName"
 
-    echo "Data inserted successfully into $local_TableName."
+    echo "Data inserted successfully into $local_TableName. ✅ "
 }
 
 
@@ -240,13 +240,9 @@ function updateTable () {
         echo "Table Not Found."
         return
     fi
-    if [ ! -s "$targetTableName" ]; then
-        echo "The table is empty."
-        return
-    fi
     
    
-   read -p "Enter the feild name: " targetFeildName
+   read -p "Enter the feild name 😃 : " targetFeildName
     
    #check if the feild exist or not 
    
@@ -290,10 +286,8 @@ function updateTable () {
      
      if [[ $feildData =~ ^[0-9]+$ ]]
      then
-        # echo "yes"
         validData=1
      else
-       echo "no"
         validData=0
     fi    
    fi
@@ -305,30 +299,34 @@ function updateTable () {
      validData=1
      fi
    fi
-   
-  local feildIndex=$(awk -v pattern="$targetFeildName" '$1 == pattern {print NR}' "${targetTableName}.meta")
-   
+     
+
+
+
+
    if [ $validData -eq 1 ]
    then
       #check if the data Exist or not 
-        read -p "enter id or pirmary key data( if you do not want that option press '.' ): " specificData
+        read -p "enter pirmary key data( if you do not want that option press '.' ): " specificData
         
         if [ $specificData = "." ]; then
+
+           if [ $isPrimary -eq 1 ]; then
+             echo "sorry but the column is primary it must be unique 😞 "
+             return
+           fi 
+
            # Replace oldData with feildData within the feild feildIndex
-          ((feildIndex--))
           
           touch ${targetTableName}.meta_temp
           awk -v feildIndex="$feildIndex" -v newData="$feildData" '{
-              for (i=1; i<=NF; i++) { 
-                  if (i == feildIndex )
-                      $i=newData
-              }
+              $feildIndex=newData
               print
           }' "$targetTableName" > ${targetTableName}.meta_temp
           cat ${targetTableName}.meta_temp > ${targetTableName}
           rm ${targetTableName}.meta_temp
 
-           echo "updated sucessfully"
+           echo "updated sucessfully ✅"
         else
           #check if the data integrity for the primary data entered
           dataIntegrity `awk -v pattern="PRIMARY" '$2 == pattern {print $3; exit}' "${targetTableName}.meta"` 
@@ -340,27 +338,43 @@ function updateTable () {
               if [[ $specificData =~ ^[0-9]+$ ]]
               then
                   specificValidData=1
-              else
-                  specificValidData=0
               fi
               
             elif [ $primaryKeyDataType -eq 2 ]; then
+              
               specificValidData=1
             else
               specificValidData=0
             fi
+
             if [ $specificValidData -eq 1 ];then
-              local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
-                for (i=1; i<=NF; i++) { 
-                    
-                    if ($i == specificData) {
-                        print NR
-                        exit
-                    }
-                }
-             } ' "$targetTableName")  
-              
-             ((feildIndex--))
+
+                if [[ $isPrimary -eq 1 ]]; then
+                  searchElementInColumn "$pkColumn" "$feildData" "$targetTableName"
+                  local returnsearchElementInColumn=$?
+                  if [[ $returnsearchElementInColumn -eq 1 ]]; then
+                    echo "Can't Insert repeated Data In a Primary Column. 😞"
+                    return 
+                  fi
+                fi
+
+
+                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$specificData" '{
+              if ($feildIndex == specificData) {
+                  print NR
+                  returned=NR
+                  found=1
+                  exit
+              }
+          } END {
+              if(found!=1)
+               print 0
+
+          }' "$targetTableName")         
+             if [[ $pkRow -eq 0 ]]; then
+              echo "Data you inserted is not found in the primary column ❌"
+              return
+             fi
              touch ${targetTableName}.meta_temp
              awk -v feildIndex="$feildIndex" -v pkRow="$pkRow" -v newData="$feildData" '{
                 for (i=1; i<=NF; i++) { 
@@ -372,11 +386,11 @@ function updateTable () {
             print } ' "$targetTableName" > ${targetTableName}.meta_temp
             cat ${targetTableName}.meta_temp > "$targetTableName"
             rm  ${targetTableName}.meta_temp
-           echo "sucessfully updated"
+           echo "sucessfully updated ✅"
      
 
           else
-            echo "Data Mis Match With The Primary Key Please Try Again"
+            echo "Data Mis Match With The Primary Key Please Try Again ❌"
           fi
                         
         
@@ -384,10 +398,10 @@ function updateTable () {
         
         
         else
-        echo "the data you entered is not exist plaese try the steps from the begining..."    
+        echo "the data you entered is not exist ❌ plaese try the steps from the begining..."    
       fi     
    else
-    echo "the entered data is not exist please enter the name again..."
+    echo "the entered data is not exist ❌ please enter the name again..."
    fi
 
    
@@ -397,20 +411,21 @@ function updateTable () {
 
 function deleteFromTable () {
     local targetTableName=$1  
-    if [ ! -s "$targetTableName" ]; then
-        echo "The Table is empty."
-        return
-    fi
 
     # Check if the table exists or not 
     if [ -f "$targetTableName" ]; then
+         if [ ! -s "$local_TableName" ]; then
+        echo "The Table is empty. ❌"
+        return
+      fi
+ 
         local choice=0
         read -p "Delete all (press 0) or enter specific id (press 1): " choice
 
         # Delete all
         if [ $choice -eq 0 ]; then
             echo -n "" > "$targetTableName"
-            echo "Deleted successfully"
+            echo "Deleted successfully ✅"
         elif [ $choice -eq 1 ]; then
             # Delete by id
             read -p "Enter the primary key for the row you want to delete from: " pkData
@@ -434,32 +449,20 @@ function deleteFromTable () {
             else
               specificValidData=0
             fi
-             
+            echo "$specificValidData" 
             if [ $specificValidData -eq 1 ];then
 
                   #get the primary key index
-                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$pkData" '
-                  {
-                      for (i=1; i<=NF; i++) { 
-                          if ($i == specificData) {
-                              found=NR
-                          }
-                      }
-                  }
-                  END {
-                      if (found == 0)
-                          print 0
-                      else
-                         print found
-                  }
-              ' "$targetTableName" ) 
-
-
-                if [ $pkRow -eq 0 ] 
-                then
-                  echo "data you entered is not found in the primary key"
-                  return
-                fi  
+                  local pkRow=$(awk -v feildIndex="$pkColumn" -v specificData="$pkData" '{
+                    for (i=1; i<=NF; i++) { 
+                        
+                        if ($i == specificData) {
+                            print NR
+                            exit
+                        }
+                    }
+                } ' "$targetTableName")
+                  
                 #Delete By Id
                 touch "${targetTableName}.meta_temp"
                 awk -v pkRow="$pkRow" '{
@@ -468,22 +471,21 @@ function deleteFromTable () {
                 }' "$targetTableName" > ${targetTableName}.meta_temp
                cat ${targetTableName}.meta_temp > ${targetTableName}
                rm ${targetTableName}.meta_temp
-                echo "Suceccfully Deleted"  
+                echo "Suceccfully Deleted ✅"  
              else 
-               echo "you Entered Wrong Data Can't delete"
+               echo "you Entered Wrong Data Can't delete ❌"
 
             fi    
             # Use sed to delete the row where the primary key exists
             
         else
-            echo "Wrong choice. Please enter a correct number."
+            echo "Wrong choice. ❌ Please enter a correct number."
         fi
     
     else
-        echo "Table does not exist. Please try again ..."
+        echo "Table does not exist. ❌ Please try again ..."
     fi
 }
-
 
 
 
@@ -492,12 +494,12 @@ function selectFromTable()
     local local_TableName="$1"
 
     if [ ! -f "$local_TableName" ]; then
-        echo "Table Not Found."
+        echo "Table Not Found. ❌"
         return
     fi
 
     if [ ! -s "$local_TableName" ]; then
-        echo "The Table is empty."
+        echo "The Table is empty. ❌"
         return
     fi
 
@@ -509,10 +511,10 @@ function selectFromTable()
     echo "Available Columns: ${columns[*]}"
 
     while true; do
-    read -p "Enter (column) name to select or enter (*) to select all or enter (.) to select row : " selectedColumn
+    read -p "Enter (column) name to select or enter (*) to select all or enter (.) to select row 😃 : " selectedColumn
    
     if [[ $selectedColumn != "*" && ! " ${columns[@]} " =~ " $selectedColumn " && $selectedColumn != "." ]]; then
-    echo "Invalid column name. Please select a valid column."
+    echo "Invalid column name ❌. Please select a valid column."
     else
       break
     fi
@@ -522,7 +524,9 @@ function selectFromTable()
     if [ "$selectedColumn" == "*" ]; then
         echo "Selected Data from $local_TableName:"
         echo "${columns[*]}"
+        echo "--------------------------------------"
         cat "$local_TableName"
+        echo " "
     elif [ "$selectedColumn" == "." ];
     then
      read -p "enter ${columns} value to select from: " primaryKeyValue
@@ -537,7 +541,7 @@ function selectFromTable()
     }
     END {
         if (isFound == 0)
-            print "Data is not found table"
+            print "Data is not found table ❌"
     }
 ' "$local_TableName"
 

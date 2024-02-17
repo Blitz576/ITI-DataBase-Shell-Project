@@ -5,7 +5,7 @@ source ../.././function/other_function.sh
 
 PS3="$1 > "
 
-echo "welcome to DataBase $1"
+echo "welcome to DataBase $1 👋 "
 
 select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "Delete From Table" "Update Table" "Select From Table" "Back To DataBase main system"; do
     case $REPLY in
@@ -42,7 +42,7 @@ select menu in "Create a Table" "List Tables" "Drop Table" "insert Into Table" "
             selectFromTable "$_tableName" 
             ;;
         8)
-           echo "Welcome To your DataBase Again"
+           echo "Welcome To your dbms Again 👋"
            break;
         ;;    
         *)

@@ -3,9 +3,9 @@ source ./function/other_function.sh
 
 
 function createDataBasesDirectory () {
-    echo "Welcome to our Bash Sql system."
+    echo "Welcome to our Bash Sql system. 👋"
     echo "After reading this line, a database directory has been created in your current directory under the name of 'DataBases'."
-    echo "If you have used our program before, don't worry ..."
+    echo "If you have used our program before, don't worry 🤗"
     
     if [ ! -d "DataBases" ]; then
         mkdir "DataBases"
@@ -23,7 +23,7 @@ function createDataBase () {
     validateName "$local_dbName" "DataBase" 
     if [ $? -eq 1 ]; then
        mkdir -p "DataBases/$local_dbName"
-       echo "$local_dbName Created Successfully."         
+       echo "$local_dbName Created Successfully. ✅"         
     fi  
    fi
 }
@@ -40,27 +40,27 @@ function connectToDataBase () {
             cd ../..
             break
         else
-          echo "DataBase is not exist"
+          echo "DataBase is not exist ❌"
           read -p "Enter the database name: " dbName
         fi
         done
     else
-        echo "Missing DataBases directory please create a DataBase"
+        echo "Missing DataBases directory please create a DataBase ❌"
     fi
     
 }
 function dropDataBase() {
     local local_dbName="$1"
     while true; do
-    if [ ! -d "DataBases/$local_dbName" ]; then
-        echo "Database Not Found."
+    if   [ ! -d "DataBases/$local_dbName" ] ; then
+        echo "Database Not Found. ❌"
         read -p "Enter the database name: " _dbName
     else
          break
     fi
     done
     rm -r DataBases/$local_dbName
-    echo "$local_dbName deleted successfully"
+    echo "$local_dbName deleted successfully ✅"
     
 }
 function listDataBases() {
@@ -78,6 +78,6 @@ function listDataBases() {
             fi
         done
     else
-        echo "Database directory not found."
+        echo "Database directory not found. ❌"
     fi
 }
