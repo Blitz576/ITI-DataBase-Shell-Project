@@ -1,0 +1,4 @@
+Feild_Name Primary_Constraint Data_Type
+id PRIMARY INT
+name NOT STRING
+age NOT INT

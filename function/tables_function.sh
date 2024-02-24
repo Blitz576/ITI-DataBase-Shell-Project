@@ -293,7 +293,7 @@ function updateTable () {
    fi
      
    if [ $returnDataIntegrity -eq 2 ]; then
-     if [ ${#feildData} -lt 1 ];then
+     if [[ $feildData =~ ^[0-9]+$ ]];then
      validData=0
    else
      validData=1
@@ -414,7 +414,7 @@ function deleteFromTable () {
 
     # Check if the table exists or not 
     if [ -f "$targetTableName" ]; then
-         if [ ! -s "$local_TableName" ]; then
+         if [ ! -s "$targetTableName" ]; then
         echo "The Table is empty. ❌"
         return
       fi

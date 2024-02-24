@@ -25,6 +25,7 @@ function validateName(){
             return 1;  
             ;;
     esac
+    return 0;
 }
 
 function checkPrimary(){
